@@ -1,0 +1,37 @@
+{
+  "name": "Hassan Aguezoum — Frontend Engineer",
+  "short_name": "Hassan Aguezoum",
+  "description": "Frontend engineer focused on SaaS dashboards and API-driven products. React, Next.js, TypeScript.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/face.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "categories": [
+    "business",
+    "technology"
+  ],
+  "orientation": "portrait-primary"
+}
