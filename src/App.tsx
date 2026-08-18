@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { Analytics } from "@vercel/analytics/react";
 import Hero from "./components/Hero";
 import About from "./components/About";
 import Background from "./components/backGround";
@@ -99,6 +100,7 @@ function App() {
         </div>
 
       </div>
+      <Analytics />
     </>
   );
 }
