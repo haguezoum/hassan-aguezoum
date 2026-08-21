@@ -1,0 +1,207 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import WebGLBackground from "../components/WebGLBackground.tsx";
+import Hero from "../components/Hero.astro";
+import About from "../components/About.astro";
+import Projects from "../components/Projects.astro";
+import Experience from "../components/Experience.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<BaseLayout
+  title="Hassan Aguezoum — Frontend Engineer"
+  description="Frontend engineer building responsive SaaS dashboards and API-driven products with React, Next.js, and TypeScript."
+>
+  <WebGLBackground client:only="react" />
+
+  <img
+    src="/face.png"
+    alt="Hassan Aguezoum"
+    width="56"
+    height="56"
+    class="fixed bottom-4 right-4 z-50 w-10 h-10 sm:w-11 sm:h-11 lg:w-14 lg:h-14 rounded-full object-cover"
+  />
+
+  <div aria-hidden="true" class="fixed inset-0 z-0 pointer-events-none bg-gradient-overlay"></div>
+
+  <main class="relative z-10 text-white antialiased flex flex-col gap-24 px-6 sm:px-4 lg:px-8 max-w-7xl mx-auto lg:flex-row lg:gap-0 selection:bg-white selection:text-black">
+    <Hero />
+
+    <div class="lg:w-[55%] min-w-0">
+      <div id="about" data-section-index="0" class="mb-16 sm:mb-18 lg:mb-20">
+        <About />
+      </div>
+      <div id="projects" data-section-index="1" class="mb-16 sm:mb-18 lg:mb-20">
+        <Projects />
+      </div>
+      <div id="checkpoints" data-section-index="2" class="mb-16 sm:mb-18 lg:mb-20">
+        <Experience />
+      </div>
+      <Footer />
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import gsap from "gsap";
+  import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-section-index]"));
+  const navButtons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-nav-index]"));
+
+  function setActiveSection(index: number) {
+    navButtons.forEach((button, buttonIndex) => {
+      if (buttonIndex === index) button.setAttribute("aria-current", "location");
+      else button.removeAttribute("aria-current");
+    });
+  }
+
+  sections.forEach((section, index) => {
+    ScrollTrigger.create({
+      trigger: section,
+      start: "top 55%",
+      end: "bottom 45%",
+      onEnter: () => setActiveSection(index),
+      onEnterBack: () => setActiveSection(index),
+    });
+  });
+
+  navButtons.forEach((button, index) => {
+    button.addEventListener("click", () => {
+      const target = sections[index];
+      if (!target) return;
+      gsap.to(window, {
+        duration: reduceMotion ? 0 : 1.1,
+        scrollTo: { y: target, autoKill: false },
+        ease: "power4.inOut",
+      });
+    });
+  });
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  document.querySelectorAll<HTMLElement>("[data-nav-label]").forEach((label) => {
+    const original = label.dataset.value ?? label.innerText;
+    let interval = 0;
+
+    const stop = () => {
+      window.clearInterval(interval);
+      interval = 0;
+    };
+
+    label.parentElement?.addEventListener("mouseenter", () => {
+      if (reduceMotion) return;
+      stop();
+      let progress = 0;
+      interval = window.setInterval(() => {
+        label.innerText = original
+          .split("")
+          .map((character, characterIndex) =>
+            characterIndex < progress
+              ? original[characterIndex]
+              : character === " "
+                ? " "
+                : letters[Math.floor(Math.random() * letters.length)],
+          )
+          .join("");
+        progress += 1 / 3;
+        if (progress >= original.length) {
+          stop();
+          label.innerText = original;
+        }
+      }, 40);
+    });
+
+    label.parentElement?.addEventListener("mouseleave", () => {
+      stop();
+      label.innerText = original;
+    });
+  });
+
+  if (!reduceMotion) {
+    document.querySelectorAll<HTMLElement>("[data-project-list], #checkpoints").forEach((group) => {
+      gsap.fromTo(
+        group.querySelectorAll("[data-reveal-row]"),
+        { opacity: 0, x: -15 },
+        { opacity: 1, x: 0, duration: 0.3, stagger: 0.06, ease: "power2.out" },
+      );
+    });
+  }
+
+  const phrases = ["build", "design", "ship", "think", "feel"];
+  const typeText = document.querySelector<HTMLElement>("[data-type-text]");
+  if (typeText) {
+    if (reduceMotion) {
+      typeText.textContent = phrases[0];
+    } else {
+      let phraseIndex = 0;
+      let characterIndex = 0;
+      let deleting = false;
+
+      const type = () => {
+        const phrase = phrases[phraseIndex];
+        characterIndex += deleting ? -1 : 1;
+        typeText.textContent = phrase.slice(0, characterIndex);
+
+        if (!deleting && characterIndex === phrase.length) {
+          deleting = true;
+          window.setTimeout(type, 1200);
+          return;
+        }
+        if (deleting && characterIndex === 0) {
+          deleting = false;
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+        }
+        window.setTimeout(type, deleting ? 40 : 80);
+      };
+      type();
+    }
+  }
+
+  const quotes = [
+    '"Developers work hard to earn money and they give their work for free at the same time."',
+    '"Remember kids, modern problems require modern solutions."',
+    '"facebook is down, thanks god not our app #facebook_is_down"',
+  ];
+  const quote = document.querySelector<HTMLElement>("[data-footer-quote]");
+  const quoteText = document.querySelector<HTMLElement>("[data-quote-text]");
+  const xLogo = document.querySelector<HTMLElement>("[data-x-logo]");
+  let quoteIndex = Math.floor(Math.random() * quotes.length);
+  let quoteHovered = false;
+  if (quoteText) quoteText.textContent = quotes[quoteIndex];
+
+  window.setInterval(() => {
+    if (!quote || !quoteText || quoteHovered) return;
+    quote.classList.add("opacity-0");
+    window.setTimeout(() => {
+      let next = quoteIndex;
+      while (next === quoteIndex) next = Math.floor(Math.random() * quotes.length);
+      quoteIndex = next;
+      quoteText.textContent = quotes[quoteIndex];
+      quote.classList.remove("opacity-0");
+    }, reduceMotion ? 0 : 280);
+  }, 5000);
+
+  quote?.addEventListener("pointerenter", () => {
+    quoteHovered = true;
+    if (!xLogo) return;
+    gsap.killTweensOf(xLogo);
+    gsap
+      .timeline()
+      .set(xLogo, { autoAlpha: 0, rotation: 0, x: 0, scale: reduceMotion ? 1 : 0.85 })
+      .to(xLogo, { autoAlpha: 1, scale: 1, duration: reduceMotion ? 0.2 : 0.3, ease: "power2.out" })
+      .to(xLogo, reduceMotion
+        ? { autoAlpha: 0, duration: 0.25, delay: 0.9 }
+        : { rotation: 30, x: 10, duration: 0.35, ease: "sine.inOut" })
+      .to(xLogo, reduceMotion ? {} : { rotation: -30, x: -10, duration: 0.45, ease: "sine.inOut" })
+      .to(xLogo, reduceMotion ? {} : { rotation: 30, x: 10, duration: 0.45, ease: "sine.inOut" })
+      .to(xLogo, reduceMotion ? {} : { rotation: -30, x: -10, duration: 0.45, ease: "sine.inOut" })
+      .to(xLogo, reduceMotion ? {} : { autoAlpha: 0, rotation: 0, x: 0, duration: 0.35, ease: "power2.in" });
+  });
+  quote?.addEventListener("pointerleave", () => {
+    quoteHovered = false;
+  });
+</script>
