@@ -11,7 +11,7 @@ interface Props {
 const { title, description } = Astro.props;
 const siteURL = Astro.site ? new URL(Astro.site) : new URL(Astro.url.origin);
 const canonicalURL = new URL(Astro.url.pathname, siteURL);
-const profileImageURL = new URL("/face.png", siteURL);
+const profileImageURL = new URL("/face.webp", siteURL);
 const personID = new URL("/#hassan-aguezoum", siteURL);
 const websiteID = new URL("/#website", siteURL);
 
@@ -98,7 +98,7 @@ const structuredData = {
 
     <link rel="canonical" href={canonicalURL} />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="/favicon.webp" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
