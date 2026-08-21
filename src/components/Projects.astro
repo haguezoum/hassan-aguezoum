@@ -23,7 +23,7 @@ const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5
         class="group py-6 sm:py-7 lg:py-8 px-4 sm:px-6 lg:px-8 hover:bg-neutral-900/10 transition-all duration-300"
       >
         <div class="flex flex-col gap-4">
-          <span class="text-xs text-neutral-500 font-bold tracking-widest">PROJECT {number}</span>
+          <span class="text-xs text-white/60 font-bold tracking-widest">PROJECT {number}</span>
 
           <div>
             {primaryHref ? (
@@ -42,7 +42,7 @@ const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5
           </p>
 
           {project.url && (
-            <div class="text-[11px] text-neutral-500">
+            <div class="text-[11px] text-white/60">
               <div class="flex items-center gap-1">
                 DEPLOY:
                 <a href={project.url} target="_blank" rel="noopener noreferrer" class="text-neutral-300 underline font-semibold flex items-center gap-0.5 hover:text-white">

@@ -53,11 +53,11 @@ body {
 }
 
 .portfolio-nav {
-    color: rgb(255 255 255 / 40%);
+    color: rgb(255 255 255 / 60%);
 }
 
 .portfolio-nav [data-nav-number] {
-    color: rgb(255 255 255 / 20%);
+    color: rgb(255 255 255 / 60%);
     font-size: 0.875rem;
     transform: translateX(-0.5rem);
     transition: color 300ms, font-size 300ms, transform 300ms;
@@ -89,7 +89,7 @@ body {
 }
 
 [data-project-list]:has([data-project]:hover) [data-project]:not(:hover) {
-    opacity: 0.5;
+    opacity: 0.8;
 }
 
 .type-cursor {
