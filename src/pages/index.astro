@@ -15,7 +15,9 @@ import Footer from "../components/Footer.astro";
   <WebGLBackground client:idle={{ timeout: 2000 }} />
 
   <img
-    src="/face.webp"
+    src="/face-56.webp"
+    srcset="/face-40.webp 40w, /face-56.webp 56w, /face-80.webp 80w, /face-112.webp 112w"
+    sizes="(min-width: 1024px) 56px, (min-width: 640px) 44px, 40px"
     alt="Portrait of Hassan Aguezoum, frontend engineer and 1337 student"
     width="56"
     height="56"
