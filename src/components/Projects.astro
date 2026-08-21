@@ -4,7 +4,7 @@ import { projects } from "./projects.json";
 const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5V5h6V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6h-2v6Z`;
 ---
 
-<h2 class="text-xl uppercase font-bold px-4 sm:px-6 lg:px-8 mb-10 sm:mb-12 lg:hidden">Projects</h2>
+<h2 id="projects-heading" class="text-xl uppercase font-bold px-4 sm:px-6 lg:px-8 mb-10 sm:mb-12 lg:sr-only">Selected frontend projects</h2>
 <div class="space-y-0 divide-y divide-white/20" data-project-list>
   {projects.map((project, index) => {
     const number = String(index + 1).padStart(2, "0");
