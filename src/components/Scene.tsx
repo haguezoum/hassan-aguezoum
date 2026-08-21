@@ -1,4 +1,4 @@
-import { useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -34,6 +34,7 @@ const Scene = () => {
   const tiltTarget     = useRef(new THREE.Vector2());
   const tiltCurrent    = useRef(new THREE.Vector2());
   const ndcMouse       = useRef(new THREE.Vector2());
+  const reduceMotion   = useRef(false);
 
   const { gl, camera, size } = useThree();
 
@@ -115,7 +116,9 @@ const Scene = () => {
   };
   const handlePointerLeave = () => tiltTarget.current.set(0, 0);
 
-  useMemo(() => {
+  useEffect(() => {
+    reduceMotion.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     // Listen on window — not the canvas — so the light keeps following the
     // cursor even when it moves over HTML elements stacked above the canvas.
     window.addEventListener("pointermove",  handlePointerMove);
@@ -132,8 +135,10 @@ const Scene = () => {
     // smooth tilt
     const tc = tiltCurrent.current;
     const tt = tiltTarget.current;
-    tc.x += (tt.x - tc.x) * 0.015;
-    tc.y += (tt.y - tc.y) * 0.015;
+    const targetX = reduceMotion.current ? 0 : tt.x;
+    const targetY = reduceMotion.current ? 0 : tt.y;
+    tc.x += (targetX - tc.x) * 0.015;
+    tc.y += (targetY - tc.y) * 0.015;
     if (pivotRef.current) {
       pivotRef.current.rotation.x = tc.x;
       pivotRef.current.rotation.y = tc.y;

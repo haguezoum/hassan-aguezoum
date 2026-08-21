@@ -1,6 +1,3 @@
-/*fonts*/
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
-
 @import "tailwindcss";
 
 @theme {
@@ -51,6 +48,56 @@
 
 body {
     background-color: #000;
+    min-width: 320px;
+    min-height: 100vh;
+}
+
+.portfolio-nav {
+    color: rgb(255 255 255 / 40%);
+}
+
+.portfolio-nav [data-nav-number] {
+    color: rgb(255 255 255 / 20%);
+    font-size: 0.875rem;
+    transform: translateX(-0.5rem);
+    transition: color 300ms, font-size 300ms, transform 300ms;
+}
+
+.portfolio-nav [data-nav-label] {
+    font-size: 0.875rem;
+    transform: translateX(-0.5rem);
+    transition: color 300ms, font-size 300ms, transform 300ms;
+}
+
+.portfolio-nav:hover {
+    color: rgb(255 255 255 / 80%);
+}
+
+.portfolio-nav[aria-current="location"] {
+    color: white;
+}
+
+.portfolio-nav[aria-current="location"] [data-nav-number] {
+    color: white;
+    font-size: 1rem;
+    transform: translateX(0);
+}
+
+.portfolio-nav[aria-current="location"] [data-nav-label] {
+    font-size: 1rem;
+    transform: translateX(0.5rem);
+}
+
+[data-project-list]:has([data-project]:hover) [data-project]:not(:hover) {
+    opacity: 0.5;
+}
+
+.type-cursor {
+    animation: cursor-blink 1s steps(1, end) infinite;
+}
+
+@keyframes cursor-blink {
+    50% { opacity: 0; }
 }
 
 .bg-gradient-overlay {
@@ -61,4 +108,14 @@ body {
     .bg-gradient-overlay {
         background: linear-gradient(90deg, transparent 0%, transparent 2%, black 60%, black 100%);
     } 
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .type-cursor {
+        animation: none;
+    }
 }
