@@ -26,7 +26,7 @@ export const projects: Project[] = [
       "Frontend dashboard for universities, majors, and academic paths with API-driven search, dynamic filtering, and structured navigation.",
     url: "https://dashboard.greatwall.ma/programs",
     repo: "",
-    tags: ["Next.js", "TypeScript", "REST APIs", "Vercel"],
+    tags: ["Next.js", "TypeScript", "REST APIs", "Tailwind CSS", "shadcn/ui", "Docker"],
     image: "",
   },
   {
@@ -36,7 +36,7 @@ export const projects: Project[] = [
       "Exam-preparation interface with realistic test flows and protected HLS video playback for learning content.",
     url: "https://dashboard.greatwall.ma/csca",
     repo: "",
-    tags: ["Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui"],
+    tags: ["Next.js", "TypeScript", "FFmpeg", "Tailwind CSS", "shadcn/ui", "Docker", "HLS.js", "Video.js"],
     image: "",
   },
   {
