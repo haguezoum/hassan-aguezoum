@@ -25,39 +25,77 @@ const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5
         <div class="flex flex-col gap-4">
           <span class="text-xs text-white/60 font-bold tracking-widest">PROJECT {number}</span>
 
-          <div>
-            {primaryHref ? (
-              <a href={primaryHref} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 group/title">
-                <svg viewBox="0 0 24 24" aria-hidden="true" class="text-white/60 group-hover:text-white transition-colors duration-200 w-6 h-6 sm:w-7 sm:h-7 fill-current"><path d={externalIcon} /></svg>
-                <h3 class="font-bold text-xl sm:text-2xl text-white tracking-tighter uppercase leading-none">{project.name}</h3>
-              </a>
-            ) : (
-              <h3 class="font-bold text-xl sm:text-2xl text-white tracking-tighter uppercase leading-none">{project.name}</h3>
-            )}
-            {subtitle && <p class="text-xs text-neutral-400 mt-1.5 uppercase tracking-wide">{subtitle}</p>}
-          </div>
+          <div class:list={["grid items-start gap-5", project.image && "sm:grid-cols-[minmax(0,1fr)_9rem] lg:grid-cols-[minmax(0,1fr)_11rem]"]}>
+            <div class="flex min-w-0 flex-col gap-4">
+              <div>
+                {primaryHref ? (
+                  <a href={primaryHref} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 group/title">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" class="text-white/60 group-hover:text-white transition-colors duration-200 w-6 h-6 sm:w-7 sm:h-7 fill-current"><path d={externalIcon} /></svg>
+                    <h3 class="font-bold text-xl sm:text-2xl text-white tracking-tighter uppercase leading-none">{project.name}</h3>
+                  </a>
+                ) : (
+                  <h3 class="font-bold text-xl sm:text-2xl text-white tracking-tighter uppercase leading-none">{project.name}</h3>
+                )}
+                {subtitle && <p class="text-xs text-neutral-400 mt-1.5 uppercase tracking-wide">{subtitle}</p>}
+              </div>
 
-          <p class="font-light text-sm sm:text-base text-white/60 leading-relaxed tracking-tight group-hover:text-white transition-colors duration-300">
-            {project.description}
-          </p>
+              <p class="font-light text-sm sm:text-base text-white/60 leading-relaxed tracking-tight group-hover:text-white transition-colors duration-300">
+                {project.description}
+              </p>
 
-          {project.url && (
-            <div class="text-[11px] text-white/60">
-              <div class="flex items-center gap-1">
-                DEPLOY:
-                <a href={project.url} target="_blank" rel="noopener noreferrer" class="text-neutral-300 underline font-semibold flex items-center gap-0.5 hover:text-white">
-                  ONLINE INSTANCE
-                </a>
+              {project.url && (
+                <div class="text-[11px] text-white/60">
+                  <div class="flex items-center gap-1">
+                    DEPLOY:
+                    <a href={project.url} target="_blank" rel="noopener noreferrer" class="text-neutral-300 underline font-semibold flex items-center gap-0.5 hover:text-white">
+                      ONLINE INSTANCE
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              <div class="flex flex-wrap gap-1.5">
+                {project.tags.map((tag) => (
+                  <span class="px-2.5 py-0.5 border border-white/10 bg-black text-[10px] text-neutral-400 capitalize tracking-wide hover:border-white hover:text-white transition-colors rounded-none">
+                    {tag}
+                  </span>
+                ))}
               </div>
             </div>
-          )}
 
-          <div class="flex flex-wrap gap-1.5">
-            {project.tags.map((tag) => (
-              <span class="px-2.5 py-0.5 border border-white/10 bg-black text-[10px] text-neutral-400 capitalize tracking-wide hover:border-white hover:text-white transition-colors rounded-none">
-                {tag}
-              </span>
-            ))}
+            {project.image && (
+              primaryHref ? (
+                <a
+                  href={primaryHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Open ${project.name}`}
+                  class="block overflow-hidden border border-white/10 bg-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                >
+                  <img
+                    src={project.image}
+                    alt={`Preview of ${project.name}`}
+                    width="640"
+                    height="400"
+                    loading="lazy"
+                    decoding="async"
+                    class="aspect-[8/5] w-full object-cover grayscale opacity-70 transition duration-500 ease-out group-hover:scale-[1.02] group-hover:grayscale-0 group-hover:opacity-100 motion-reduce:transition-none"
+                  />
+                </a>
+              ) : (
+                <div class="overflow-hidden border border-white/10 bg-neutral-950">
+                  <img
+                    src={project.image}
+                    alt={`Preview of ${project.name}`}
+                    width="640"
+                    height="400"
+                    loading="lazy"
+                    decoding="async"
+                    class="aspect-[8/5] w-full object-cover grayscale opacity-70 transition duration-500 ease-out group-hover:scale-[1.02] group-hover:grayscale-0 group-hover:opacity-100 motion-reduce:transition-none"
+                  />
+                </div>
+              )
+            )}
           </div>
         </div>
       </article>
