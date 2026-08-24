@@ -25,7 +25,7 @@ export const checkpoints: Checkpoint[] = [
             "Shipped with Next.js, TypeScript, Tailwind CSS, shadcn/ui, and Docker",
         ],
         techSkills: ["Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "Docker"],
-        link: "https://mytabib.me",
+        link: "https://tabib.haguezoum.site",
     },
     {
         id: 2,

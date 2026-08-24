@@ -14,7 +14,7 @@ export const projects: Project[] = [
     name: "Tabib",
     description:
       "Healthcare scheduling platform with a mobile-friendly patient booking flow and a doctor dashboard for availability and appointments. Covers onboarding, authentication, trial conversion, and funnel analytics.",
-    url: "https://mytabib.me",
+    url: "https://tabib.haguezoum.site",
     repo: "",
     tags: ["Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "Docker"],
     image: "",
