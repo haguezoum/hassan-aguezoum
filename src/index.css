@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+@font-face {
+    font-family: "Inter Fallback";
+    src: local("Arial");
+    font-style: normal;
+    font-weight: 100 900;
+    ascent-override: 90.2%;
+    descent-override: 22.48%;
+    line-gap-override: 0%;
+    size-adjust: 107.4%;
+}
+
 @theme {
     /*--spacing-card: 70px;*/
 
@@ -41,7 +52,7 @@
     }
 
     html {
-        font-family: "Inter", sans-serif;
+        font-family: "Inter", "Inter Fallback", sans-serif;
         font-optical-sizing: auto;
     }
 }
