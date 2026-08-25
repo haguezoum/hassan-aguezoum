@@ -5,6 +5,7 @@ export interface Project {
   url: string;
   repo: string;
   tags: string[];
+  imagePrefix: string;
   image: string;
 }
 
@@ -17,7 +18,8 @@ export const projects: Project[] = [
     url: "https://tabib.haguezoum.site",
     repo: "",
     tags: ["Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "Docker"],
-    image: "",
+    imagePrefix: "tabib",
+    image: "/images/tabib",
   },
   {
     id: 2,
@@ -27,7 +29,8 @@ export const projects: Project[] = [
     url: "https://dashboard.greatwall.ma/programs",
     repo: "",
     tags: ["Next.js", "TypeScript", "REST APIs", "Tailwind CSS", "shadcn/ui", "Docker"],
-    image: "",
+    imagePrefix: "sic",
+    image: "/images/studyInChina",
   },
   {
     id: 3,
@@ -37,7 +40,8 @@ export const projects: Project[] = [
     url: "https://dashboard.greatwall.ma/csca",
     repo: "",
     tags: ["Next.js", "TypeScript", "FFmpeg", "Tailwind CSS", "shadcn/ui", "Docker", "HLS.js", "Video.js"],
-    image: "",
+    imagePrefix: "csca",
+    image: "/images/csca",
   },
   {
     id: 4,
@@ -47,6 +51,7 @@ export const projects: Project[] = [
     url: "",
     repo: "https://github.com/haguezoum/Messa-Pong",
     tags: ["Web Components", "Django REST", "PostgreSQL", "Docker"],
+    imagePrefix: "",
     image: "",
   },
 ];
