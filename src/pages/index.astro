@@ -46,12 +46,6 @@ import Footer from "../components/Footer.astro";
 </BaseLayout>
 
 <script>
-  import gsap from "gsap";
-  import { ScrollToPlugin } from "gsap/ScrollToPlugin";
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-section-index]"));
   const navButtons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-nav-index]"));
@@ -63,24 +57,26 @@ import Footer from "../components/Footer.astro";
     });
   }
 
-  sections.forEach((section, index) => {
-    ScrollTrigger.create({
-      trigger: section,
-      start: "top 55%",
-      end: "bottom 45%",
-      onEnter: () => setActiveSection(index),
-      onEnterBack: () => setActiveSection(index),
-    });
-  });
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      const activeEntry = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!activeEntry) return;
+      const index = sections.indexOf(activeEntry.target as HTMLElement);
+      if (index >= 0) setActiveSection(index);
+    },
+    { rootMargin: "-45% 0px -45% 0px", threshold: 0 },
+  );
+  sections.forEach((section) => sectionObserver.observe(section));
 
   navButtons.forEach((button, index) => {
     button.addEventListener("click", () => {
       const target = sections[index];
       if (!target) return;
-      gsap.to(window, {
-        duration: reduceMotion ? 0 : 1.1,
-        scrollTo: { y: target, autoKill: false },
-        ease: "power4.inOut",
+      target.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "start",
       });
     });
   });
@@ -125,13 +121,30 @@ import Footer from "../components/Footer.astro";
   });
 
   if (!reduceMotion) {
-    document.querySelectorAll<HTMLElement>("[data-project-list], #checkpoints").forEach((group) => {
-      gsap.fromTo(
-        group.querySelectorAll("[data-reveal-row]"),
-        { opacity: 0, x: -15 },
-        { opacity: 1, x: 0, duration: 0.3, stagger: 0.06, ease: "power2.out" },
-      );
+    const revealRows = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal-row]"));
+    revealRows.forEach((row) => {
+      row.style.opacity = "0";
+      row.style.transform = "translateX(-15px)";
     });
+
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const row = entry.target as HTMLElement;
+          row.animate(
+            [
+              { opacity: 0, transform: "translateX(-15px)" },
+              { opacity: 1, transform: "translateX(0)" },
+            ],
+            { duration: 300, easing: "ease-out", fill: "forwards" },
+          );
+          observer.unobserve(row);
+        });
+      },
+      { rootMargin: "0px 0px -8%", threshold: 0.05 },
+    );
+    revealRows.forEach((row) => revealObserver.observe(row));
   }
 
   const phrases = ["build", "design", "ship", "think", "feel"];
@@ -191,18 +204,31 @@ import Footer from "../components/Footer.astro";
   quote?.addEventListener("pointerenter", () => {
     quoteHovered = true;
     if (!xLogo) return;
-    gsap.killTweensOf(xLogo);
-    gsap
-      .timeline()
-      .set(xLogo, { autoAlpha: 0, rotation: 0, x: 0, scale: reduceMotion ? 1 : 0.85 })
-      .to(xLogo, { autoAlpha: 1, scale: 1, duration: reduceMotion ? 0.2 : 0.3, ease: "power2.out" })
-      .to(xLogo, reduceMotion
-        ? { autoAlpha: 0, duration: 0.25, delay: 0.9 }
-        : { rotation: 30, x: 10, duration: 0.35, ease: "sine.inOut" })
-      .to(xLogo, reduceMotion ? {} : { rotation: -30, x: -10, duration: 0.45, ease: "sine.inOut" })
-      .to(xLogo, reduceMotion ? {} : { rotation: 30, x: 10, duration: 0.45, ease: "sine.inOut" })
-      .to(xLogo, reduceMotion ? {} : { rotation: -30, x: -10, duration: 0.45, ease: "sine.inOut" })
-      .to(xLogo, reduceMotion ? {} : { autoAlpha: 0, rotation: 0, x: 0, duration: 0.35, ease: "power2.in" });
+    xLogo.getAnimations().forEach((animation) => animation.cancel());
+    xLogo.style.visibility = "visible";
+    xLogo.animate(
+      reduceMotion
+        ? [
+            { opacity: 0 },
+            { opacity: 1, offset: 0.2 },
+            { opacity: 1, offset: 0.8 },
+            { opacity: 0 },
+          ]
+        : [
+            { opacity: 0, transform: "translateX(0) rotate(0deg) scale(.85)" },
+            { opacity: 1, transform: "translateX(0) rotate(0deg) scale(1)", offset: 0.15 },
+            { opacity: 1, transform: "translateX(10px) rotate(30deg)", offset: 0.32 },
+            { opacity: 1, transform: "translateX(-10px) rotate(-30deg)", offset: 0.5 },
+            { opacity: 1, transform: "translateX(10px) rotate(30deg)", offset: 0.68 },
+            { opacity: 1, transform: "translateX(-10px) rotate(-30deg)", offset: 0.86 },
+            { opacity: 0, transform: "translateX(0) rotate(0deg)" },
+          ],
+      {
+        duration: reduceMotion ? 1400 : 2350,
+        easing: "ease-in-out",
+        fill: "forwards",
+      },
+    );
   });
   quote?.addEventListener("pointerleave", () => {
     quoteHovered = false;
