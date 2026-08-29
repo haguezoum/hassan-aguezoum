@@ -45,6 +45,17 @@ export const projects: Project[] = [
   },
   {
     id: 4,
+    name: "AMADIL CLI",
+    description:
+      "AMADIL is a powerful package that helps you build projects by generating JavaScript components and pages with their respective routes",
+    url: "https://www.npmjs.com/package/amadil",
+    repo: "https://github.com/haguezoum/amadil",
+    tags: ["Node js", "JavaScript"],
+    imagePrefix: "amadil",
+    image: "/images/amadil",
+  },
+  {
+    id: 5,
     name: "Messa Pong",
     description:
       "Online Pong SPA with real-time chat, authentication, and backend services. Led frontend work in a five-person team.",
