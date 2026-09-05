@@ -43,7 +43,7 @@ const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5
         )}
 
         {checkpoint.link && (
-          <a href={checkpoint.link} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-sm text-white/60 hover:text-white transition-colors duration-200">
+          <a href={checkpoint.link} target="_blank" rel="noopener noreferrer" data-posthog-credential data-credential-type={checkpoint.type} class="inline-flex items-center gap-1.5 text-sm text-white/60 hover:text-white transition-colors duration-200">
             <svg viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 fill-current"><path d={externalIcon} /></svg>
             <span>OPEN LINK</span>
           </a>
@@ -52,3 +52,13 @@ const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5
     </article>
   ))}
 </div>
+
+<script>
+  document.querySelectorAll<HTMLAnchorElement>("[data-posthog-credential]").forEach((link) => {
+    link.addEventListener("click", () => {
+      window.posthog?.capture("portfolio_credential_opened", {
+        credential_type: link.dataset.credentialType,
+      });
+    });
+  });
+</script>

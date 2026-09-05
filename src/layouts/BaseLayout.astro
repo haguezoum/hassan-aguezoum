@@ -1,6 +1,7 @@
 ---
 import Analytics from "@vercel/analytics/astro";
 import SpeedInsights from "@vercel/speed-insights/astro";
+import PostHog from "../components/posthog.astro";
 import "../index.css";
 
 interface Props {
@@ -131,6 +132,7 @@ const structuredData = {
     <meta name="twitter:image:alt" content="Portrait of Hassan Aguezoum, frontend engineer and 1337 student" />
 
     <title>{title}</title>
+    <PostHog />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)}></script>
     <Analytics />
     <SpeedInsights />

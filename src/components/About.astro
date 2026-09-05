@@ -16,7 +16,7 @@
 
     <p class="text-base sm:text-lg font-light text-white/60 leading-relaxed">
       I'm building{" "}
-      <a href="https://tabib.haguezoum.site" target="_blank" rel="noopener noreferrer" class="text-white font-normal underline underline-offset-4 decoration-white/20 hover:decoration-white transition-all">Tabib</a>
+      <a href="https://tabib.haguezoum.site" target="_blank" rel="noopener noreferrer" data-posthog-case-study class="text-white font-normal underline underline-offset-4 decoration-white/20 hover:decoration-white transition-all">Tabib</a>
       — a healthcare scheduling platform with a mobile-friendly patient booking flow and a dashboard for
       doctors to organize availability. Onboarding, auth, trial conversion, and the analytics that tell
       you which of those actually matter.
@@ -44,3 +44,11 @@
     </p>
   </div>
 </section>
+
+<script>
+  document.querySelector<HTMLAnchorElement>("[data-posthog-case-study]")?.addEventListener("click", () => {
+    window.posthog?.capture("portfolio_case_study_opened", {
+      case_study: "tabib",
+    });
+  });
+</script>
