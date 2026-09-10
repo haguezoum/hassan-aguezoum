@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import todoImage from "../../assets/todo.png";
 import { getBlogPosts } from "../../lib/github.ts";
 
 const posts = await getBlogPosts();
@@ -15,6 +17,18 @@ const posts = await getBlogPosts();
     <p class="mt-4 text-white/60 font-light leading-relaxed">
       Welcome in — pull up a chair and stay a while. Fresh stories from the workshop are on their way.
     </p>
+
+    <Image
+      src={todoImage}
+      widths={[200, 400, 800]}
+      sizes="(max-width: 640px) 144px, 220px"
+      alt="Handwritten todo list with build portfolio, switch to Astro and add a blog checked off, signed Hassan Aguezoum"
+      width={220}
+      height={220}
+      loading="eager"
+      decoding="async"
+      class="blog-fade-in mt-8 h-auto w-36 sm:w-48 rounded-xl object-cover"
+    />
 
     <div class="mt-12 divide-y divide-white/10">
       {posts.length === 0 ? (
@@ -42,3 +56,28 @@ const posts = await getBlogPosts();
     </div>
   </main>
 </BaseLayout>
+
+<style>
+  .blog-fade-in {
+    opacity: 0;
+    animation: blog-fade-in 0.9s ease-out 0.15s forwards;
+  }
+
+  @keyframes blog-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blog-fade-in {
+      opacity: 1;
+      animation: none;
+    }
+  }
+</style>
