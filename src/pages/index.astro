@@ -208,7 +208,8 @@ import Footer from "../components/Footer.astro";
     if (!xLogo) return;
     xLogo.getAnimations().forEach((animation) => animation.cancel());
     xLogo.style.visibility = "visible";
-    xLogo.animate(
+    xLogo.style.opacity = "1";
+    const logoAnimation = xLogo.animate(
       reduceMotion
         ? [
             { opacity: 0 },
@@ -231,8 +232,17 @@ import Footer from "../components/Footer.astro";
         fill: "forwards",
       },
     );
+    logoAnimation.onfinish = () => {
+      if (!xLogo) return;
+      xLogo.style.visibility = "hidden";
+      xLogo.style.opacity = "0";
+    };
   });
   quote?.addEventListener("pointerleave", () => {
     quoteHovered = false;
+    if (!xLogo) return;
+    xLogo.getAnimations().forEach((animation) => animation.cancel());
+    xLogo.style.visibility = "hidden";
+    xLogo.style.opacity = "0";
   });
 </script>
