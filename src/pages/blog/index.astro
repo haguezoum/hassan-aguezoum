@@ -17,7 +17,10 @@ const posts = await getBlogPosts();
     </p>
 
     <div class="mt-12 divide-y divide-white/10">
-      {posts.map((post) => (
+      {posts.length === 0 ? (
+        <p class="py-8 text-white/40 font-light">No articles yet — the first post will appear here once it is published as a GitHub Issue.</p>
+      ) : (
+        posts.map((post) => (
         <article class="py-8 first:pt-0">
           <a href={`/blog/${post.slug}`} class="group block">
             <p class="text-xs text-white/40 uppercase tracking-widest">
@@ -34,7 +37,8 @@ const posts = await getBlogPosts();
             </span>
           </a>
         </article>
-      ))}
+        ))
+      )}
     </div>
   </main>
 </BaseLayout>
