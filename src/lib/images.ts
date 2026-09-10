@@ -29,13 +29,61 @@ function hashName(input: string): string {
 async function loadSourceBuffer(src: string): Promise<Buffer | null> {
   try {
     if (src.startsWith("http://") || src.startsWith("https://")) {
-      const res = await fetch(src);
+      // GitHub attachment URLs (github.com/user-attachments/...) 302-redirect
+      // to expiring signed S3 URLs. fetch follows the redirect and grabs fresh
+      // bytes now, so the built site never depends on the expiring link.
+      const res = await fetch(src, {
+        headers: { Accept: "image/*", "User-Agent": "haguezoum-portfolio-blog" },
+        redirect: "follow",
+      });
       if (!res.ok) return null;
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!contentType.startsWith("image/")) return null;
       return Buffer.from(await res.arrayBuffer());
     }
     const localPath = path.join(publicDir, src.split("?")[0].replace(/^\//, ""));
     return await readFile(localPath);
   } catch {
+    return null;
+  }
+}
+
+export interface LocalizedImage {
+  /** Local self-hosted fallback (largest generated variant). */
+  src: string;
+  srcset: string;
+}
+
+/**
+ * Download `src` (following GitHub's signed-URL redirects), generate
+ * 320/640/960/1280 WebP variants under /blog/, and return their local URLs.
+ * Returns null when the source can't be fetched — callers must fall back to
+ * the remote URL so a bad upload never breaks the build.
+ */
+export async function localizeImage(src: string, slug: string): Promise<LocalizedImage | null> {
+  if (src.startsWith("data:") || src.includes("REPLACE_WITH")) return null;
+  const buffer = await loadSourceBuffer(src);
+  if (!buffer) return null;
+  try {
+    for (const dir of outputDirs()) await mkdir(dir, { recursive: true });
+    const base = `${slug}-${hashName(src)}`;
+    const srcset: string[] = [];
+    let largest = "";
+    for (const width of WIDTHS) {
+      const fileName = `${base}-${width}.webp`;
+      const resized = await sharp(buffer).resize({ width, withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
+      for (const dir of outputDirs()) await writeFile(path.join(dir, fileName), resized);
+      const url = `${OUTPUT_DIR}${fileName}`;
+      srcset.push(`${url} ${width}w`);
+      if (width === 960) largest = url;
+    }
+    const origName = `${base}-orig.webp`;
+    const origBuffer = await sharp(buffer).webp({ quality: 82 }).toBuffer();
+    for (const dir of outputDirs()) await writeFile(path.join(dir, origName), origBuffer);
+    if (!largest) largest = `${OUTPUT_DIR}${origName}`;
+    return { src: largest, srcset: srcset.join(", ") };
+  } catch (error) {
+    console.warn(`[blog] image optimization failed for ${src}: ${(error as Error).message}`);
     return null;
   }
 }
@@ -56,36 +104,9 @@ export async function responsiveImgTag(
   const safeAlt = (alt || "Blog image").replace(/"/g, "&quot;");
   const classAttr = imgClass ? ` class="${imgClass}"` : "";
   const fallback = `<img src="${src}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 768px, 960px" loading="${loading}" decoding="async" alt="${safeAlt}"${classAttr} />`;
-  // Skip data URIs and placeholders that were never replaced with real uploads.
-  if (src.startsWith("data:") || src.includes("REPLACE_WITH")) return fallback;
-
-  const buffer = await loadSourceBuffer(src);
-  if (!buffer) return fallback;
-
-  try {
-    for (const dir of outputDirs()) await mkdir(dir, { recursive: true });
-    const base = `${slug}-${hashName(src)}`;
-    const srcset: string[] = [];
-    let largest = "";
-    for (const width of WIDTHS) {
-      const fileName = `${base}-${width}.webp`;
-      const resized = await sharp(buffer).resize({ width, withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
-      for (const dir of outputDirs()) await writeFile(path.join(dir, fileName), resized);
-      const url = `${OUTPUT_DIR}${fileName}`;
-      srcset.push(`${url} ${width}w`);
-      if (width === 960) largest = url;
-    }
-    // Persist original as well for the `src` fallback.
-    const origName = `${base}-orig.webp`;
-    const origBuffer = await sharp(buffer).webp({ quality: 82 }).toBuffer();
-    for (const dir of outputDirs()) await writeFile(path.join(dir, origName), origBuffer);
-    const origUrl = `${OUTPUT_DIR}${origName}`;
-    if (!largest) largest = origUrl;
-    return `<img src="${largest}" srcset="${srcset.join(", ")}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 768px, 960px" loading="${loading}" decoding="async" alt="${safeAlt}"${classAttr} />`;
-  } catch (error) {
-    console.warn(`[blog] image optimization failed for ${src}: ${(error as Error).message}`);
-    return fallback;
-  }
+  const localized = await localizeImage(src, slug);
+  if (!localized) return fallback;
+  return `<img src="${localized.src}" srcset="${localized.srcset}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 768px, 960px" loading="${loading}" decoding="async" alt="${safeAlt}"${classAttr} />`;
 }
 
 /** Replace every <img> in rendered HTML with a responsive variant. */
