@@ -1,5 +1,14 @@
 ---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 import { projects } from "./projects.json";
+
+const cardSources = import.meta.glob<{ default: ImageMetadata }>("/src/assets/images/*/*-1280.webp", {
+  eager: true,
+});
+
+const cardImageFor = (image: string, prefix: string) =>
+  cardSources[`/src/assets/images${image.replace("/images", "")}/${prefix}-1280.webp`]?.default ?? null;
 
 const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5V5h6V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6h-2v6Z`;
 ---
@@ -15,6 +24,7 @@ const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5
     projects.map((project, index) => {
       const number = String(index + 1).padStart(2, "0");
       const primaryHref = project.repo || project.url;
+      const cardImage = project.image && project.imagePrefix ? cardImageFor(project.image, project.imagePrefix) : null;
       const subtitle = project.repo
         ? project.repo.replace("https://github.com/", "")
         : project.url
@@ -36,7 +46,7 @@ const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5
             <div
               class:list={[
                 "grid items-start gap-5",
-                project.image &&
+                cardImage &&
                   "sm:grid-cols-[minmax(0,1fr)_9rem] lg:grid-cols-[minmax(0,1fr)_11rem]",
               ]}
             >
@@ -105,7 +115,7 @@ const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5
                 </div>
               </div>
 
-              {project.image &&
+              {cardImage &&
                 (primaryHref ? (
                   <a
                     href={primaryHref}
@@ -116,14 +126,13 @@ const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5
                     data-project-id={project.id}
                     class="block overflow-hidden border border-white/10 bg-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                   >
-                    <img
-                      src={`${project.image}/${project.imagePrefix}-320.webp`}
-                      srcset={`${project.image}/${project.imagePrefix}-320.webp 320w,
-           ${project.image}/${project.imagePrefix}-640.webp 640w`}
+                    <Image
+                      src={cardImage}
+                      widths={[320, 640]}
                       sizes="(max-width: 639px) calc(100vw - 5rem), (max-width: 1023px) 9rem, 11rem"
                       alt={`Preview of ${project.name}`}
-                      width="640"
-                      height="400"
+                      width={640}
+                      height={400}
                       loading="lazy"
                       decoding="async"
                       fetchpriority="low"
@@ -132,13 +141,16 @@ const externalIcon = `M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3Zm5 16H5
                   </a>
                 ) : (
                   <div class="overflow-hidden border border-white/10 bg-neutral-950">
-                    <img
-                      src={project.image}
+                    <Image
+                      src={cardImage}
+                      widths={[320, 640]}
+                      sizes="(max-width: 639px) calc(100vw - 5rem), (max-width: 1023px) 9rem, 11rem"
                       alt={`Preview of ${project.name}`}
-                      width="640"
-                      height="400"
+                      width={640}
+                      height={400}
                       loading="lazy"
                       decoding="async"
+                      fetchpriority="low"
                       class="aspect-8/5 w-full object-cover grayscale opacity-70 transition duration-500 ease-out group-hover:scale-[1.02] group-hover:grayscale-0 group-hover:opacity-100 motion-reduce:transition-none"
                     />
                   </div>

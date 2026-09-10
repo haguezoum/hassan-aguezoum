@@ -1,8 +1,9 @@
 import type { APIRoute } from "astro";
 
 import { projects } from "../components/projects.json";
+import { getBlogPosts } from "../lib/github.ts";
 
-const createLlmsTxt = (site: URL) => {
+const createLlmsTxt = (site: URL, postLinks: string) => {
   const portfolioURL = new URL("/", site);
   const sectionURL = (section: string) => new URL(`/#${section}`, site).href;
   const projectLinks = projects
@@ -25,10 +26,15 @@ Hassan works primarily with React, Next.js, TypeScript, REST APIs, Tailwind CSS,
 - [About Hassan](${sectionURL("about")}): Background, engineering focus, current work, location, and availability.
 - [Selected projects](${sectionURL("projects")}): Frontend and full-stack products with live deployments, source links, technology stacks, and project summaries.
 - [Experience and education](${sectionURL("checkpoints")}): Professional roles and project-based software engineering education at 1337 Coding School in the 42 Network.
+- [Blog](${new URL("/blog", site).href}): Notes on frontend engineering, written as GitHub Issues and published as static pages.
 
 ## Selected projects
 
 ${projectLinks}
+
+## Blog
+
+${postLinks}
 
 ## Professional profiles
 
@@ -38,10 +44,14 @@ ${projectLinks}
 `;
 };
 
-export const GET: APIRoute = ({ site, url }) => {
+export const GET: APIRoute = async ({ site, url }) => {
   const siteURL = site ?? new URL(url.origin);
+  const posts = await getBlogPosts();
+  const postLinks = posts
+    .map((post) => `- [${post.title}](${new URL(`/blog/${post.slug}`, siteURL).href}): ${post.description}`)
+    .join("\n");
 
-  return new Response(createLlmsTxt(siteURL), {
+  return new Response(createLlmsTxt(siteURL, postLinks), {
     headers: {
       "Content-Type": "text/markdown; charset=utf-8",
     },

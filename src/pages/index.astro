@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+import portrait from "../assets/face.webp";
 import WebGLBackground from "../components/WebGLBackground.tsx";
 import Hero from "../components/Hero.astro";
 import About from "../components/About.astro";
@@ -14,13 +16,13 @@ import Footer from "../components/Footer.astro";
 >
   <WebGLBackground client:idle={{ timeout: 2000 }} />
 
-  <img
-    src="/face-56.webp"
-    srcset="/face-40.webp 40w, /face-56.webp 56w, /face-80.webp 80w, /face-112.webp 112w"
+  <Image
+    src={portrait}
+    widths={[40, 56, 80, 112]}
     sizes="(min-width: 1024px) 56px, (min-width: 640px) 44px, 40px"
     alt="Portrait of Hassan Aguezoum, frontend engineer and 1337 student"
-    width="56"
-    height="56"
+    width={56}
+    height={56}
     decoding="async"
     class="fixed bottom-4 right-4 z-50 w-10 h-10 sm:w-11 sm:h-11 lg:w-14 lg:h-14 rounded-full object-cover"
   />
