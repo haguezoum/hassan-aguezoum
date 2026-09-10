@@ -42,11 +42,20 @@ async function loadSourceBuffer(src: string): Promise<Buffer | null> {
 
 /**
  * Generate 320/640/960/1280 WebP variants for an image and return a
- * responsive <img> tag string. Falls back to the original tag on failure.
+ * responsive <img> tag string. Never throws: on any failure it returns a
+ * plain <img> pointing at the original src so the build can't break.
  */
-export async function responsiveImgTag(_originalTag: string, src: string, alt: string, slug: string): Promise<string> {
+export async function responsiveImgTag(
+  _originalTag: string,
+  src: string,
+  alt: string,
+  slug: string,
+  imgClass = "",
+  loading: "lazy" | "eager" = "lazy",
+): Promise<string> {
   const safeAlt = (alt || "Blog image").replace(/"/g, "&quot;");
-  const fallback = `<img src="${src}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 768px, 960px" loading="lazy" decoding="async" alt="${safeAlt}" />`;
+  const classAttr = imgClass ? ` class="${imgClass}"` : "";
+  const fallback = `<img src="${src}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 768px, 960px" loading="${loading}" decoding="async" alt="${safeAlt}"${classAttr} />`;
   // Skip data URIs and placeholders that were never replaced with real uploads.
   if (src.startsWith("data:") || src.includes("REPLACE_WITH")) return fallback;
 
@@ -72,7 +81,7 @@ export async function responsiveImgTag(_originalTag: string, src: string, alt: s
     for (const dir of outputDirs()) await writeFile(path.join(dir, origName), origBuffer);
     const origUrl = `${OUTPUT_DIR}${origName}`;
     if (!largest) largest = origUrl;
-    return `<img src="${largest}" srcset="${srcset.join(", ")}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 768px, 960px" loading="lazy" decoding="async" alt="${safeAlt}" />`;
+    return `<img src="${largest}" srcset="${srcset.join(", ")}" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 768px, 960px" loading="${loading}" decoding="async" alt="${safeAlt}"${classAttr} />`;
   } catch (error) {
     console.warn(`[blog] image optimization failed for ${src}: ${(error as Error).message}`);
     return fallback;

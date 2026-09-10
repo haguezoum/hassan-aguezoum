@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { Image } from "astro:assets";
 import faceCover from "../../assets/face.webp";
 import { getBlogPosts } from "../../lib/github.ts";
+import { responsiveImgTag } from "../../lib/images.ts";
 import { estimateReadingMinutes, renderMarkdown } from "../../lib/markdown.ts";
 
 export async function getStaticPaths() {
@@ -21,6 +22,20 @@ const ogImage = post.cover ?? "/face.webp";
 // Image; anything else falls back to a plain img so a typo never breaks the build.
 const isRemoteCover = post.cover?.startsWith("http") ?? false;
 const localCover = post.cover === "/face.webp" ? faceCover : null;
+// Remote covers go through our own pipeline (never Astro inferSize): it
+// optimizes when the URL works and degrades to a plain img when it doesn't,
+// so a bad cover URL can never break the build.
+const remoteCoverHtml =
+  post.cover && !localCover && isRemoteCover
+    ? await responsiveImgTag(
+        "",
+        post.cover,
+        `Cover for ${post.title}`,
+        post.slug,
+        "mt-8 w-full rounded-none border border-white/10 object-cover",
+        "eager",
+      )
+    : null;
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -129,18 +144,7 @@ const shareLinks = {
           class="mt-8 w-full rounded-none border border-white/10 object-cover"
         />
       )}
-      {post.cover && !localCover && isRemoteCover && (
-        <Image
-          src={post.cover}
-          inferSize
-          widths={[640, 960, 1280]}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 768px, 960px"
-          alt={`Cover for ${post.title}`}
-          loading="eager"
-          decoding="async"
-          class="mt-8 w-full rounded-none border border-white/10 object-cover"
-        />
-      )}
+      {remoteCoverHtml && <Fragment set:html={remoteCoverHtml} />}
       {post.cover && !localCover && !isRemoteCover && (
         <img
           src={post.cover}
@@ -198,7 +202,10 @@ const shareLinks = {
   });
 </script>
 
-<style>
+<style is:global>
+  /* Global: this stylesheet targets Markdown HTML injected at runtime via
+     set:html, which never receives Astro's scoped data attributes. All
+     selectors are prefixed with .blog-content to stay contained. */
   .blog-content {
     display: flex;
     flex-direction: column;
@@ -206,6 +213,13 @@ const shareLinks = {
     color: rgb(255 255 255 / 75%);
     font-weight: 300;
     line-height: 1.75;
+    min-width: 0;
+  }
+  /* Flex items default to min-width:auto, which lets wide <pre> blocks push
+     the whole page wider instead of scrolling internally. */
+  .blog-content > * {
+    min-width: 0;
+    max-width: 100%;
   }
   .blog-content h2 {
     color: #fff;
@@ -221,7 +235,9 @@ const shareLinks = {
     border: 1px solid rgb(255 255 255 / 10%);
     background: #0d1117;
     padding: 1rem;
+    max-width: 100%;
     overflow-x: auto;
+    overscroll-behavior-x: contain;
     font-size: 0.8125rem;
     line-height: 1.6;
   }

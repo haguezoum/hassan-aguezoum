@@ -41,6 +41,17 @@ export function slugify(title: string): string {
     .replace(/-{2,}/g, "-");
 }
 
+/** Cover may be a plain URL, a pasted `<img src="...">` tag, or Markdown `![](...)`. */
+export function extractCoverUrl(value: string): string | undefined {
+  const trimmed = value.trim().replace(/^["']|["']$/g, "");
+  if (!trimmed || trimmed.startsWith("REPLACE_WITH")) return undefined;
+  const imgTag = trimmed.match(/<img\b[^>]*\bsrc="([^"]+)"/i);
+  if (imgTag) return imgTag[1];
+  const mdImg = trimmed.match(/!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/);
+  if (mdImg) return mdImg[1];
+  return trimmed;
+}
+
 export function parseFrontmatterComment(body: string): {
   description: string;
   cover?: string;
@@ -63,7 +74,7 @@ export function parseFrontmatterComment(body: string): {
     if (!m) continue;
     const [, key, value] = m;
     if (key.toLowerCase() === "description") description = value;
-    if (key.toLowerCase() === "cover") cover = value;
+    if (key.toLowerCase() === "cover") cover = extractCoverUrl(value);
   }
   if (!description) {
     const firstParagraph = rest
@@ -72,7 +83,6 @@ export function parseFrontmatterComment(body: string): {
       .find((p) => p.length > 0) ?? "";
     description = firstParagraph.slice(0, 160);
   }
-  if (cover?.startsWith("REPLACE_WITH")) cover = undefined;
   return { description, cover, rest };
 }
 
