@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
+import { resolveGitHubAttachment } from "./github.ts";
 
 const WIDTHS = [320, 640, 960, 1280];
 const OUTPUT_DIR = "/blog/";
@@ -32,18 +33,28 @@ async function loadSourceBuffer(src: string): Promise<Buffer | null> {
       // GitHub attachment URLs (github.com/user-attachments/...) 302-redirect
       // to expiring signed S3 URLs. fetch follows the redirect and grabs fresh
       // bytes now, so the built site never depends on the expiring link.
-      const res = await fetch(src, {
+      const options: RequestInit = {
         headers: { Accept: "image/*", "User-Agent": "haguezoum-portfolio-blog" },
         redirect: "follow",
-      });
-      if (!res.ok) return null;
+        signal: AbortSignal.timeout(30_000),
+      };
+      let res = await fetch(src, options);
+      if (!res.ok || !res.headers.get("content-type")?.startsWith("image/")) {
+        await res.body?.cancel();
+        // Some attachments return 404 even with a token. GitHub's Markdown
+        // renderer can supply a fresh signed URL that we consume immediately.
+        const resolved = await resolveGitHubAttachment(src);
+        if (resolved) res = await fetch(resolved, { ...options, signal: AbortSignal.timeout(30_000) });
+      }
+      if (!res.ok) throw new Error(`Image download failed (HTTP ${res.status})`);
       const contentType = res.headers.get("content-type") ?? "";
       if (!contentType.startsWith("image/")) return null;
       return Buffer.from(await res.arrayBuffer());
     }
     const localPath = path.join(publicDir, src.split("?")[0].replace(/^\//, ""));
     return await readFile(localPath);
-  } catch {
+  } catch (error) {
+    console.warn(`[blog] Image download failed: ${(error as Error).message}`);
     return null;
   }
 }
@@ -57,8 +68,8 @@ export interface LocalizedImage {
 /**
  * Download `src` (following GitHub's signed-URL redirects), generate
  * 320/640/960/1280 WebP variants under /blog/, and return their local URLs.
- * Returns null when the source can't be fetched — callers must fall back to
- * the remote URL so a bad upload never breaks the build.
+ * Returns null when the source can't be fetched. Required covers should fail
+ * the build rather than publish a broken remote image.
  */
 export async function localizeImage(src: string, slug: string): Promise<LocalizedImage | null> {
   if (src.startsWith("data:") || src.includes("REPLACE_WITH")) return null;
@@ -67,7 +78,7 @@ export async function localizeImage(src: string, slug: string): Promise<Localize
     if (src.startsWith("http")) {
       console.warn(
         `[blog] Could not download image for "${slug}": ${src.slice(0, 100)} — ` +
-          `page will hotlink it instead. Fix the URL in the GitHub Issue (use the Markdown URL GitHub inserts on upload).`,
+          `Check GITHUB_BLOG_TOKEN access and the original attachment URL in the GitHub Issue.`,
       );
     }
     return null;

@@ -25,19 +25,14 @@ const isRemoteCover = post.cover?.startsWith("http") ?? false;
 const localCover = post.cover === "/face.webp" ? faceCover : null;
 const localizedCover =
   post.cover && !localCover && isRemoteCover ? await localizeImage(post.cover, post.slug) : null;
+if (isRemoteCover && !localizedCover) {
+  throw new Error(`[blog] Cannot publish cover for Issue #${post.issueNumber}. Check the attachment URL and GITHUB_BLOG_TOKEN access.`);
+}
 if (localizedCover) console.log(`[blog] cover self-hosted for ${post.slug}`);
 const ogImage = localizedCover?.src ?? post.cover ?? "/face.webp";
 const coverAlt = `Cover for ${post.title}`;
 const coverClass = "mt-8 w-full rounded-none border border-white/10 object-cover";
 const coverSizes = "(max-width: 640px) 100vw, (max-width: 1024px) 768px, 960px";
-// Display tag reuses the same self-hosted files (single download). When
-// localization failed, fall back to the remote URL rather than breaking.
-const remoteCoverHtml =
-  post.cover && !localCover && isRemoteCover
-    ? localizedCover
-      ? `<img src="${localizedCover.src}" srcset="${localizedCover.srcset}" sizes="${coverSizes}" loading="eager" decoding="async" alt="${coverAlt}" class="${coverClass}" />`
-      : `<img src="${post.cover}" sizes="${coverSizes}" loading="eager" decoding="async" alt="${coverAlt}" class="${coverClass}" />`
-    : null;
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -146,7 +141,10 @@ const shareLinks = {
           class="mt-8 w-full rounded-none border border-white/10 object-cover"
         />
       )}
-      {remoteCoverHtml && <Fragment set:html={remoteCoverHtml} />}
+      {localizedCover && (
+        <img src={localizedCover.src} srcset={localizedCover.srcset} sizes={coverSizes}
+          loading="eager" decoding="async" alt={coverAlt} class={coverClass} />
+      )}
       {post.cover && !localCover && !isRemoteCover && (
         <img
           src={post.cover}

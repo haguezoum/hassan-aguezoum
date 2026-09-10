@@ -3,6 +3,44 @@ const REPO = (process.env.GITHUB_BLOG_REPO ?? import.meta.env.GITHUB_BLOG_REPO ?
 const LABEL = (process.env.GITHUB_BLOG_LABEL ?? import.meta.env.GITHUB_BLOG_LABEL ?? "blog").replace(/["']/g, "");
 const TOKEN = process.env.GITHUB_BLOG_TOKEN ?? import.meta.env.GITHUB_BLOG_TOKEN ?? "";
 
+/** Resolve restricted attachments at build time; never publish this temporary URL. */
+export async function resolveGitHubAttachment(src: string): Promise<string | undefined> {
+  const source = new URL(src);
+  if (source.origin !== "https://github.com" ||
+      !/^\/user-attachments\/assets\/[a-f0-9-]+$/i.test(source.pathname)) return undefined;
+
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "Content-Type": "application/json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    "User-Agent": "haguezoum-portfolio-blog",
+  };
+  // Send credentials only to the API, never to the image host or its redirects.
+  if (TOKEN) headers.Authorization = `Bearer ${TOKEN}`;
+  const response = await fetch("https://api.github.com/markdown", {
+    method: "POST",
+    headers,
+    redirect: "error",
+    signal: AbortSignal.timeout(30_000),
+    body: JSON.stringify({
+      text: `![Blog image](${source.origin}${source.pathname})`,
+      mode: "gfm",
+      context: `${OWNER}/${REPO}`,
+    }),
+  });
+  if (!response.ok) throw new Error(`GitHub image resolution failed (HTTP ${response.status})`);
+  const html = await response.text();
+  const resolved = html.match(/<img\b[^>]*\bsrc="([^"]+)"/i)?.[1]?.replace(/&amp;/g, "&");
+  if (!resolved) return undefined;
+  const url = new URL(resolved);
+  if (url.protocol !== "https:" || ![
+    "private-user-images.githubusercontent.com",
+    "user-images.githubusercontent.com",
+    "github.com",
+  ].includes(url.hostname)) return undefined;
+  return url.href === source.href ? undefined : url.href;
+}
+
 export interface BlogPost {
   slug: string;
   title: string;
