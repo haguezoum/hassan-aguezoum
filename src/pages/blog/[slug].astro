@@ -44,6 +44,14 @@ const jsonLd = {
   },
   mainEntityOfPage: canonicalURL.href,
 };
+
+const encodedURL = encodeURIComponent(canonicalURL.href);
+const encodedTitle = encodeURIComponent(post.title);
+const shareLinks = {
+  x: `https://twitter.com/intent/tweet?url=${encodedURL}&text=${encodedTitle}`,
+  linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedURL}`,
+  facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedURL}`,
+};
 ---
 
 <BaseLayout
@@ -68,6 +76,48 @@ const jsonLd = {
       </p>
       <h1 class="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-balance">{post.title}</h1>
       <p class="mt-4 text-white/60 font-light leading-relaxed">{post.description}</p>
+      <div class="mt-5 flex items-center gap-2" aria-label="Share this article">
+        <span class="text-[11px] uppercase tracking-widest text-white/40">Share</span>
+        <a
+          href={shareLinks.x}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Share on X"
+          data-posthog-share="x"
+          class="inline-flex h-8 w-8 items-center justify-center border border-white/10 text-white/60 transition-colors hover:border-white/40 hover:text-white"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="w-3.5 h-3.5 fill-current"><path d="M18.24 2.25h3.68l-8.04 9.19 9.46 12.31h-7.4l-5.8-7.58-6.63 7.58H-.17l8.58-9.8L-.66 2.25h7.59l5.24 6.93 6.07-6.93Zm-1.29 19.33h2.04L5.82 4.31H3.63l13.32 17.27Z" /></svg>
+        </a>
+        <a
+          href={shareLinks.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Share on LinkedIn"
+          data-posthog-share="linkedin"
+          class="inline-flex h-8 w-8 items-center justify-center border border-white/10 text-white/60 transition-colors hover:border-white/40 hover:text-white"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="w-3.5 h-3.5 fill-current"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V8.98h3.42v1.57h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.29ZM5.32 7.41a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12Zm1.78 13.04H3.54V8.98H7.1v11.47Z" /></svg>
+        </a>
+        <a
+          href={shareLinks.facebook}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Share on Facebook"
+          data-posthog-share="facebook"
+          class="inline-flex h-8 w-8 items-center justify-center border border-white/10 text-white/60 transition-colors hover:border-white/40 hover:text-white"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="w-3.5 h-3.5 fill-current"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.09 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.89v2.26h3.32l-.53 3.49h-2.79V24C19.61 23.09 24 18.1 24 12.07Z" /></svg>
+        </a>
+        <button
+          type="button"
+          data-share-copy={canonicalURL.href}
+          aria-label="Copy article link"
+          class="inline-flex h-8 items-center gap-1.5 border border-white/10 px-2.5 text-[11px] uppercase tracking-widest text-white/60 transition-colors hover:border-white/40 hover:text-white"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="w-3.5 h-3.5 fill-current"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z" /></svg>
+          <span data-share-copy-label>Copy link</span>
+        </button>
+      </div>
       {post.cover && localCover && (
         <Image
           src={localCover}
@@ -114,6 +164,39 @@ const jsonLd = {
     </footer>
   </main>
 </BaseLayout>
+
+<script>
+  const copyButton = document.querySelector<HTMLButtonElement>("[data-share-copy]");
+  copyButton?.addEventListener("click", async () => {
+    const url = copyButton.dataset.shareCopy ?? window.location.href;
+    const label = copyButton.querySelector<HTMLElement>("[data-share-copy-label]");
+    const restore = () => {
+      window.setTimeout(() => {
+        if (label) label.textContent = "Copy link";
+      }, 2000);
+    };
+    try {
+      await navigator.clipboard.writeText(url);
+      if (label) label.textContent = "Copied ✓";
+      window.posthog?.capture("blog_link_copied");
+    } catch {
+      const fallback = document.createElement("textarea");
+      fallback.value = url;
+      document.body.appendChild(fallback);
+      fallback.select();
+      document.execCommand("copy");
+      fallback.remove();
+      if (label) label.textContent = "Copied ✓";
+    }
+    restore();
+  });
+
+  document.querySelectorAll<HTMLAnchorElement>("[data-posthog-share]").forEach((link) => {
+    link.addEventListener("click", () => {
+      window.posthog?.capture("blog_shared", { platform: link.dataset.posthogShare });
+    });
+  });
+</script>
 
 <style>
   .blog-content {
