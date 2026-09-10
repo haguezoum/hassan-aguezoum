@@ -12,26 +12,26 @@ const posts = await getBlogPosts();
   description="Notes on frontend engineering, Astro, and API-driven products by Hassan Aguezoum. Written as GitHub Issues, published as static pages."
 >
   <main class="relative z-10 text-white antialiased max-w-3xl mx-auto px-6 sm:px-4 py-16 sm:py-24">
-    <header class="relative overflow-hidden">
+    <Image
+      src={todoImage}
+      widths={[288, 576, 800]}
+      sizes="(max-width: 640px) 288px, 400px"
+      alt=""
+      aria-hidden="true"
+      width={400}
+      height={400}
+      loading="eager"
+      decoding="async"
+      class="blog-fade-in pointer-events-none fixed top-1/2 right-0 -z-10 h-auto w-72 -translate-y-1/2 translate-x-1/4 opacity-25 select-none sm:w-100 sm:opacity-30 rounded-xl object-cover"
+    />
+    <header class="relative">
       <div class="relative z-10">
         <a href="/" class="text-xs uppercase tracking-widest text-white/60 hover:text-white transition-colors">← Back to portfolio</a>
         <h1 class="mt-6 text-3xl sm:text-4xl font-bold tracking-tight uppercase">Blog</h1>
-        <p class="mt-4 max-w-md text-white/60 font-light leading-relaxed">
+        <p class="mt-4 text-white/60 font-light leading-relaxed">
           Welcome in — pull up a chair and stay a while. Fresh stories from the workshop are on their way.
         </p>
       </div>
-      <Image
-        src={todoImage}
-        widths={[200, 400, 800]}
-        sizes="(max-width: 640px) 112px, 400px"
-        alt=""
-        aria-hidden="true"
-        width={192}
-        height={192}
-        loading="eager"
-        decoding="async"
-        class="blog-fade-in pointer-events-none absolute top-0 right-0 h-auto w-28 translate-x-1/4 opacity-40 select-none sm:w-100 sm:translate-x-1/2 sm:opacity-60 rounded-xl object-cover"
-      />
     </header>
 
     <div class="mt-12 divide-y divide-white/10">
