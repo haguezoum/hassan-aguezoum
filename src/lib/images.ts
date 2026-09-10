@@ -63,7 +63,15 @@ export interface LocalizedImage {
 export async function localizeImage(src: string, slug: string): Promise<LocalizedImage | null> {
   if (src.startsWith("data:") || src.includes("REPLACE_WITH")) return null;
   const buffer = await loadSourceBuffer(src);
-  if (!buffer) return null;
+  if (!buffer) {
+    if (src.startsWith("http")) {
+      console.warn(
+        `[blog] Could not download image for "${slug}": ${src.slice(0, 100)} — ` +
+          `page will hotlink it instead. Fix the URL in the GitHub Issue (use the Markdown URL GitHub inserts on upload).`,
+      );
+    }
+    return null;
+  }
   try {
     for (const dir of outputDirs()) await mkdir(dir, { recursive: true });
     const base = `${slug}-${hashName(src)}`;
