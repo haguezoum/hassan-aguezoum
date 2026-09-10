@@ -18,7 +18,7 @@ const posts = await getBlogPosts();
 
     <div class="mt-12 divide-y divide-white/10">
       {posts.length === 0 ? (
-        <p class="py-8 text-white/40 font-light">No articles yet — the first post will appear here once it is published as a GitHub Issue.</p>
+        <p class="py-8 text-white/60 font-light leading-relaxed">Welcome in — the kettle is on and the first stories are still brewing. Check back soon.</p>
       ) : (
         posts.map((post) => (
         <article class="py-8 first:pt-0">
