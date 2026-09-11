@@ -1,6 +1,4 @@
 ---
-import Analytics from "@vercel/analytics/astro";
-import SpeedInsights from "@vercel/speed-insights/astro";
 import PostHog from "../components/posthog.astro";
 import "../index.css";
 
@@ -12,9 +10,12 @@ interface Props {
   publishedTime?: string;
   modifiedTime?: string;
   jsonLd?: unknown;
+  preloadImage?: string;
+  preloadSrcset?: string;
+  preloadSizes?: string;
 }
 
-const { title, description, ogType = "profile", publishedTime, modifiedTime } = Astro.props;
+const { title, description, ogType = "profile", publishedTime, modifiedTime, preloadImage, preloadSrcset, preloadSizes } = Astro.props;
 const siteURL = Astro.site ? new URL(Astro.site) : new URL(Astro.url.origin);
 const canonicalURL = new URL(Astro.url.pathname, siteURL);
 const profileImageURL = new URL("/face.webp", siteURL);
@@ -110,12 +111,37 @@ const structuredData = Astro.props.jsonLd ?? {
     <link rel="describedby" type="text/markdown" href="/llms.txt" />
     <link rel="icon" type="image/png" href="/favicon.webp" />
     <link rel="manifest" href="/site.webmanifest" />
+    {preloadImage && (
+      <link
+        rel="preload"
+        as="image"
+        href={preloadSrcset ? undefined : preloadImage}
+        imagesrcset={preloadSrcset}
+        imagesizes={preloadSrcset ? (preloadSizes ?? "100vw") : undefined}
+        fetchpriority="high"
+      />
+    )}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {/* Non-blocking font load: preload + print-media swap keeps FCP off the
+        critical path. Only the weights actually used (light→bold). */}
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      />
+    </noscript>
 
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content={ogType} />
@@ -144,8 +170,34 @@ const structuredData = Astro.props.jsonLd ?? {
     <title>{title}</title>
     <PostHog />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)}></script>
-    <Analytics />
-    <SpeedInsights />
+    {/* Vercel Analytics + Speed Insights are queued now and injected on idle,
+        so their JS never competes with LCP/FCP bandwidth or main-thread parse. */}
+    <script is:inline>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+      window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+      (function () {
+        var load = function () {
+          if (document.querySelector('script[data-vercel-deferred="insights"]')) return;
+          var a = document.createElement("script");
+          a.src = "/_vercel/insights/script.js";
+          a.defer = true;
+          a.dataset.vercelDeferred = "insights";
+          a.onerror = function () {};
+          document.head.appendChild(a);
+          var s = document.createElement("script");
+          s.src = "/_vercel/speed-insights/script.js";
+          s.defer = true;
+          s.dataset.vercelDeferred = "speed-insights";
+          s.onerror = function () {};
+          document.head.appendChild(s);
+        };
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(load, { timeout: 4000 });
+        } else {
+          window.addEventListener("load", function () { setTimeout(load, 2500); }, { once: true });
+        }
+      })();
+    </script>
   </head>
   <body>
     <slot />
