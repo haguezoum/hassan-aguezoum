@@ -1,0 +1,36 @@
+name: Auto Post new Blog trigger on every new github issue
+
+on:
+  issues:
+    types:
+      - labeled
+      - edited
+      - reopened
+      - closed
+      - unlabeled
+
+concurrency:
+    group: blog-post
+    cancel-in-progress: true
+jobs:
+    Deploy-Production:
+        runs-on: ubuntu-latest
+        if: |
+            (
+                github.event.issue.state == 'open' &&
+                contains(github.event.issue.labels.*.name, 'published') &&
+                (github.event.action == 'labeled' || github.event.action == 'edited' || github.event.action == 'reopened')
+            )
+            ||
+            (
+                github.event.action == 'closed' && contains(github.event.issue.labels.*.name, 'published')
+            )
+            ||
+            (
+                github.event.action == 'unlabeled' && github.event.label.name == 'published'
+            )
+        steps:
+            - name: Trigger Vercel deployment
+              env: 
+                DEPLOY_HOOK: ${{ secrets.DEPLOY_HOOK }}
+              run: curl --fail-with-body --silent --show-error --request POST "$DEPLOY_HOOK"
