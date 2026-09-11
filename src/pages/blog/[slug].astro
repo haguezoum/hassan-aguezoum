@@ -33,6 +33,8 @@ const ogImage = localizedCover?.src ?? post.cover ?? "/face.webp";
 const coverAlt = `Cover for ${post.title}`;
 const coverClass = "mt-8 w-full rounded-none border border-white/10 object-cover";
 const coverSizes = "(max-width: 640px) 100vw, (max-width: 1024px) 768px, 960px";
+// LCP cover: preload srcset so the browser discovers it in <head>.
+const preloadSrcset = localizedCover?.srcset;
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -74,6 +76,9 @@ const shareLinks = {
   publishedTime={post.createdAt}
   modifiedTime={post.updatedAt}
   jsonLd={jsonLd}
+  preloadImage={localizedCover?.src}
+  preloadSrcset={preloadSrcset}
+  preloadSizes={coverSizes}
 >
   <main class="relative z-10 text-white antialiased max-w-3xl mx-auto px-6 sm:px-4 py-16 sm:py-24">
     <a href="/blog" class="text-xs uppercase tracking-widest text-white/60 hover:text-white transition-colors">← All articles</a>
@@ -136,20 +141,25 @@ const shareLinks = {
           widths={[640, 960, 1280]}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 768px, 960px"
           alt={`Cover for ${post.title}`}
+          width={960}
+          height={960}
           loading="eager"
+          fetchpriority="high"
           decoding="async"
           class="mt-8 w-full rounded-none border border-white/10 object-cover"
         />
       )}
       {localizedCover && (
         <img src={localizedCover.src} srcset={localizedCover.srcset} sizes={coverSizes}
-          loading="eager" decoding="async" alt={coverAlt} class={coverClass} />
+          width={localizedCover.width} height={localizedCover.height}
+          fetchpriority="high" loading="eager" decoding="async" alt={coverAlt} class={coverClass} />
       )}
       {post.cover && !localCover && !isRemoteCover && (
         <img
           src={post.cover}
           alt={`Cover for ${post.title}`}
           loading="eager"
+          fetchpriority="high"
           decoding="async"
           class="mt-8 w-full rounded-none border border-white/10 object-cover"
         />
