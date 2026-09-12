@@ -1,0 +1,44 @@
+---
+const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || "G-XBK2FVXXN1";
+---
+
+<link rel="preconnect" href="https://www.googletagmanager.com" />
+<link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+<script is:inline define:vars={{ measurementId }}>
+  // Stub gtag immediately (no network cost) so events queue in dataLayer.
+  // The gtag.js library (~100KB+) is deferred until browser idle so it never
+  // competes with LCP image / FCP bandwidth or main-thread parse budget.
+  window.dataLayer = window.dataLayer || [];
+  window.gtag =
+    window.gtag ||
+    function () {
+      window.dataLayer.push(arguments);
+    };
+  window.gtag("js", new Date());
+  window.gtag("config", measurementId);
+
+  (function () {
+    var load = function () {
+      if (document.querySelector('script[data-ga-deferred="true"]')) return;
+      var s = document.createElement("script");
+      s.src =
+        "https://www.googletagmanager.com/gtag/js?id=" +
+        encodeURIComponent(measurementId);
+      s.async = true;
+      s.dataset.gaDeferred = "true";
+      s.onerror = function () {};
+      document.head.appendChild(s);
+    };
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(load, { timeout: 4000 });
+    } else {
+      window.addEventListener(
+        "load",
+        function () {
+          setTimeout(load, 2500);
+        },
+        { once: true },
+      );
+    }
+  })();
+</script>

@@ -1,5 +1,6 @@
 ---
 import PostHog from "../components/posthog.astro";
+import GoogleAnalytics from "../components/GoogleAnalytics.astro";
 import "../index.css";
 
 interface Props {
@@ -169,6 +170,7 @@ const structuredData = Astro.props.jsonLd ?? {
 
     <title>{title}</title>
     <PostHog />
+    <GoogleAnalytics />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)}></script>
     {/* Vercel Analytics + Speed Insights are queued now and injected on idle,
         so their JS never competes with LCP/FCP bandwidth or main-thread parse. */}
