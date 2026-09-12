@@ -33,8 +33,37 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.14"></stop>
           <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop>
         </radialGradient>
+        <linearGradient id="mono-shine" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"></stop>
+          <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.55"></stop>
+          <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop>
+        </linearGradient>
+        <clipPath id="mono-clip">
+          <text
+            x="320"
+            y="182"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            font-family="Inter, system-ui, -apple-system, sans-serif"
+            font-size="190"
+            font-weight="900"
+            letter-spacing="-8"
+          >404</text>
+        </clipPath>
       </defs>
       <g>
+        <g class="pop-stars" fill="#FFFFFF">
+          <circle class="pop-star" style="animation-delay:0s;animation-duration:2.6s" cx="88" cy="72" r="2.4"></circle>
+          <circle class="pop-star" style="animation-delay:.7s;animation-duration:3.4s" cx="168" cy="312" r="1.8"></circle>
+          <circle class="pop-star" style="animation-delay:1.3s;animation-duration:2.9s" cx="70" cy="238" r="2"></circle>
+          <circle class="pop-star" style="animation-delay:.4s;animation-duration:3.1s" cx="548" cy="66" r="2.6"></circle>
+          <circle class="pop-star" style="animation-delay:1.8s;animation-duration:2.7s" cx="572" cy="252" r="1.7"></circle>
+          <circle class="pop-star" style="animation-delay:2.2s;animation-duration:3.6s" cx="478" cy="318" r="2.2"></circle>
+          <circle class="pop-star" style="animation-delay:.2s;animation-duration:2.4s" cx="212" cy="52" r="1.6"></circle>
+          <circle class="pop-star" style="animation-delay:1.1s;animation-duration:3.2s" cx="448" cy="44" r="2"></circle>
+          <circle class="pop-star" style="animation-delay:2.6s;animation-duration:2.8s" cx="606" cy="168" r="2.3"></circle>
+          <circle class="pop-star" style="animation-delay:1.6s;animation-duration:3.8s" cx="34" cy="160" r="1.8"></circle>
+        </g>
         <g class="pop-burst-in">
           <ellipse cx="320" cy="182" rx="270" ry="130" fill="url(#mono-glow)"></ellipse>
           <text
@@ -64,6 +93,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             letter-spacing="-8"
             fill="url(#mono-ink)"
           >404</text>
+        </g>
+        <g clip-path="url(#mono-clip)">
+          <g transform="skewX(-18)">
+            <rect class="pop-shine" x="0" y="0" width="110" height="360" fill="url(#mono-shine)"></rect>
+          </g>
         </g>
       </g>
     </svg>
@@ -97,6 +131,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   button[data-pop-shuffle]:hover .pop-digits.pop-settled { transform: scale(1.045) rotate(-1deg); }
   .pop-fade-up { animation: pop-fade-up .5s ease both; }
   [data-pop-art].pop-pow { animation: pop-pow .45s ease; transform-origin: center; }
+  .pop-star { opacity: .5; animation: pop-twinkle 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .pop-shine { animation: pop-shine 5.5s ease-in-out 2s infinite; }
 
   @keyframes pop-panel-in {
     from { opacity: 0; transform: scale(.55) rotate(-7deg); }
@@ -127,11 +163,22 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     78% { transform: scale(1.03, .97) rotate(-.5deg); }
     100% { transform: scale(1) rotate(0deg); }
   }
+  @keyframes pop-twinkle {
+    0%, 100% { opacity: .12; transform: scale(.7); }
+    50% { opacity: .85; transform: scale(1.15); }
+  }
+  @keyframes pop-shine {
+    0% { transform: translateX(-320px); opacity: 0; }
+    8% { opacity: 1; }
+    40% { transform: translateX(800px); opacity: 1; }
+    48%, 100% { transform: translateX(800px); opacity: 0; }
+  }
 
   @media (prefers-reduced-motion: reduce) {
-    .pop-enter, .pop-float, .pop-burst-in, .pop-digits, .pop-fade-up, [data-pop-art].pop-pow {
+    .pop-enter, .pop-float, .pop-burst-in, .pop-digits, .pop-fade-up, .pop-star, .pop-shine, [data-pop-art].pop-pow {
       animation: none !important;
     }
+    .pop-shine { opacity: 0 !important; }
   }
 </style>
 
