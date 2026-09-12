@@ -1,0 +1,201 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="404 — Page not found | Hassan Aguezoum"
+  description="The page you are looking for does not exist."
+>
+  <main data-pop-stage class="relative z-10 text-white antialiased max-w-3xl mx-auto px-6 sm:px-4 py-24 sm:py-32 text-center">
+    <button
+      type="button"
+      data-pop-shuffle
+      aria-label="Shift the 404 artwork shade"
+      style="perspective: 900px"
+      class="pop-enter block w-full cursor-pointer bg-transparent border-0 p-0 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/70"
+    >
+      <span data-pop-tilt class="block will-change-transform">
+        <span class="pop-float block">
+    <svg
+      data-pop-art
+      aria-hidden="true"
+      viewBox="0 0 640 360"
+      role="presentation"
+      class="w-full max-w-xl h-auto mx-auto select-none"
+    >
+      <defs>
+        <linearGradient id="mono-ink" x1="0" y1="0" x2="0" y2="1">
+          <stop data-shade offset="0" stop-color="#FFFFFF"></stop>
+          <stop data-shade offset="0.55" stop-color="#D4D4D8"></stop>
+          <stop data-shade offset="1" stop-color="#71717A"></stop>
+        </linearGradient>
+        <radialGradient id="mono-glow" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.14"></stop>
+          <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <g>
+        <g class="pop-burst-in">
+          <ellipse cx="320" cy="182" rx="270" ry="130" fill="url(#mono-glow)"></ellipse>
+          <text
+            x="320"
+            y="188"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            font-family="Inter, system-ui, -apple-system, sans-serif"
+            font-size="230"
+            font-weight="900"
+            letter-spacing="-6"
+            fill="none"
+            stroke="#FFFFFF"
+            stroke-opacity="0.1"
+            stroke-width="2"
+          >404</text>
+        </g>
+        <g class="pop-digits">
+          <text
+            x="320"
+            y="182"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            font-family="Inter, system-ui, -apple-system, sans-serif"
+            font-size="190"
+            font-weight="900"
+            letter-spacing="-8"
+            fill="url(#mono-ink)"
+          >404</text>
+        </g>
+      </g>
+    </svg>
+        </span>
+      </span>
+    </button>
+    <h1 class="pop-fade-up mt-4 text-3xl sm:text-4xl font-bold tracking-tight uppercase" style="animation-delay:.5s">Page not found</h1>
+    <p class="pop-fade-up mt-4 text-white/60 font-light leading-relaxed" style="animation-delay:.6s">
+      The page you are looking for does not exist or was moved.
+    </p>
+
+    <div class="pop-fade-up mt-8 flex items-center justify-center gap-4" style="animation-delay:.7s">
+      <a href="/" class="text-xs uppercase tracking-widest text-white/60 hover:text-white transition-colors">← Back home</a>
+      <a href="/blog" class="text-xs uppercase tracking-widest text-white/60 hover:text-white transition-colors">Blog →</a>
+    </div>
+
+    <!-- <p class="pop-fade-up mt-6 text-[11px] uppercase tracking-widest text-white/30" style="animation-delay:.85s">
+      Move your cursor over the art — click it to shift the shade
+    </p> -->
+
+    <!-- Add your own content below -->
+  </main>
+</BaseLayout>
+
+<style>
+  .pop-enter { animation: pop-panel-in .65s cubic-bezier(.2, 1.25, .3, 1) both; transform-origin: center; }
+  .pop-float { animation: pop-float 4.5s ease-in-out 1.4s infinite alternate; }
+  .pop-burst-in { animation: pop-burst-in .55s cubic-bezier(.2, 1.4, .3, 1) .15s both; transform-box: fill-box; transform-origin: center; }
+  .pop-digits { animation: pop-digits-in .5s cubic-bezier(.2, 1.4, .3, 1) .35s both; transform-box: fill-box; transform-origin: center; transition: transform .25s ease; filter: drop-shadow(0 14px 28px rgba(255, 255, 255, 0.14)); }
+  .pop-digits.pop-settled { animation: none; }
+  button[data-pop-shuffle]:hover .pop-digits.pop-settled { transform: scale(1.045) rotate(-1deg); }
+  .pop-fade-up { animation: pop-fade-up .5s ease both; }
+  [data-pop-art].pop-pow { animation: pop-pow .45s ease; transform-origin: center; }
+
+  @keyframes pop-panel-in {
+    from { opacity: 0; transform: scale(.55) rotate(-7deg); }
+    60% { opacity: 1; transform: scale(1.05) rotate(1.5deg); }
+    to { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  @keyframes pop-float {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+  }
+  @keyframes pop-burst-in {
+    from { opacity: 0; transform: scale(0) rotate(-30deg); }
+    to { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  @keyframes pop-digits-in {
+    from { opacity: 0; transform: translateY(-70px) scale(1.5); }
+    60% { opacity: 1; transform: translateY(10px) scale(.93); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes pop-fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pop-pow {
+    0% { transform: scale(1) rotate(0deg); }
+    30% { transform: scale(1.1, .84) rotate(-2.5deg); }
+    55% { transform: scale(.93, 1.08) rotate(2deg); }
+    78% { transform: scale(1.03, .97) rotate(-.5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pop-enter, .pop-float, .pop-burst-in, .pop-digits, .pop-fade-up, [data-pop-art].pop-pow {
+      animation: none !important;
+    }
+  }
+</style>
+
+<script>
+  const stage = document.querySelector<HTMLElement>("[data-pop-stage]");
+  const shuffleBtn = document.querySelector<HTMLButtonElement>("[data-pop-shuffle]");
+  const tilt = document.querySelector<HTMLElement>("[data-pop-tilt]");
+  const art = document.querySelector<SVGSVGElement>("[data-pop-art]");
+  const digits = art?.querySelector(".pop-digits");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Hand the digits off from the entrance animation to the hover transition.
+  digits?.addEventListener("animationend", () => digits.classList.add("pop-settled"), { once: true });
+
+  // Pointer tilt with a little smoothing.
+  if (stage && tilt && !reduceMotion) {
+    let targetX = 0, targetY = 0, currentX = 0, currentY = 0, raf = 0;
+    const render = () => {
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
+      tilt.style.transform = `rotateY(${currentX.toFixed(2)}deg) rotateX(${currentY.toFixed(2)}deg)`;
+      if (Math.abs(targetX - currentX) > 0.01 || Math.abs(targetY - currentY) > 0.01) {
+        raf = window.requestAnimationFrame(render);
+      } else {
+        raf = 0;
+      }
+    };
+    const kick = () => {
+      if (!raf) raf = window.requestAnimationFrame(render);
+    };
+    stage.addEventListener("pointermove", (event) => {
+      const rect = stage.getBoundingClientRect();
+      const px = (event.clientX - rect.left) / rect.width - 0.5;
+      const py = (event.clientY - rect.top) / rect.height - 0.5;
+      targetX = px * 14;
+      targetY = -py * 12;
+      kick();
+    });
+    stage.addEventListener("pointerleave", () => {
+      targetX = 0;
+      targetY = 0;
+      kick();
+    });
+  }
+
+  // Click (or Enter / Space on the button) → POW squash-and-stretch + next monochrome shade.
+  const shadeThemes = [
+    ["#FFFFFF", "#D4D4D8", "#71717A"],
+    ["#FFFFFF", "#F4F4F5", "#A1A1AA"],
+    ["#FAFAFA", "#A1A1AA", "#3F3F46"],
+    ["#FFFFFF", "#E4E4E7", "#52525B"],
+  ];
+  let shadeIndex = 0;
+  shuffleBtn?.addEventListener("click", () => {
+    shadeIndex = (shadeIndex + 1) % shadeThemes.length;
+    const stops = Array.from(art?.querySelectorAll("[data-shade]") ?? []);
+    stops.forEach((stop, i) => stop.setAttribute("stop-color", shadeThemes[shadeIndex][i] ?? "#FFFFFF"));
+    if (art && !reduceMotion) {
+      art.classList.remove("pop-pow");
+      void art.getBoundingClientRect();
+      art.classList.add("pop-pow");
+    }
+  });
+  art?.addEventListener("animationend", (event) => {
+    if (event.animationName === "pop-pow") art.classList.remove("pop-pow");
+  });
+</script>
