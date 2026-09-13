@@ -1,5 +1,9 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import BlogTooltip from "../components/BlogTooltip.astro";
+import { getBlogPosts } from "../lib/github.ts";
+
+const recentPosts = (await getBlogPosts()).slice(0, 5);
 ---
 
 <BaseLayout
@@ -111,7 +115,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     <div class="pop-fade-up mt-8 flex items-center justify-center gap-4" style="animation-delay:.7s">
       <a href="/" class="text-xs uppercase tracking-widest text-white/60 hover:text-white transition-colors">← Back home</a>
-      <a href="/blog" class="text-xs uppercase tracking-widest text-white/60 hover:text-white transition-colors">Blog →</a>
+      <BlogTooltip id="blog-tip-404" posts={recentPosts} placement="top" arrow="center">
+        <a href="/blog" aria-describedby="blog-tip-404" class="text-xs uppercase tracking-widest text-white/60 hover:text-white transition-colors">Blog →</a>
+      </BlogTooltip>
     </div>
 
     <!-- <p class="pop-fade-up mt-6 text-[11px] uppercase tracking-widest text-white/30" style="animation-delay:.85s">
