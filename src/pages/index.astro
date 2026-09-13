@@ -24,12 +24,12 @@ import Footer from "../components/Footer.astro";
     width={56}
     height={56}
     decoding="async"
-    class="fixed bottom-4 right-4 z-50 w-10 h-10 sm:w-11 sm:h-11 lg:w-14 lg:h-14 rounded-full object-cover"
+    class="fixed bottom-4 right-4 z-50 hidden w-10 h-10 sm:w-11 sm:h-11 lg:block lg:w-14 lg:h-14 rounded-full object-cover"
   />
 
   <div aria-hidden="true" class="fixed inset-0 z-0 pointer-events-none bg-gradient-overlay"></div>
 
-  <main class="relative z-10 text-white antialiased flex flex-col gap-24 px-6 sm:px-4 lg:px-8 max-w-7xl mx-auto lg:flex-row lg:gap-0 selection:bg-white selection:text-black">
+  <main class="relative z-10 text-white antialiased flex flex-col gap-8 sm:gap-12 px-6 sm:px-4 lg:px-8 max-w-7xl mx-auto lg:flex-row lg:gap-0 selection:bg-white selection:text-black">
     <Hero />
 
     <div class="lg:w-[55%] min-w-0">
