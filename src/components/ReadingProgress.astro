@@ -1,0 +1,40 @@
+---
+// Fixed top reading-progress bar. Pure Tailwind styling; the scroll driver
+// below writes only `transform: scaleX()` (compositor-only, no layout thrash).
+// The initial state lives in `transform` too — never mix a Tailwind scale-*
+// class here, since v4 implements it via the standalone `scale` property
+// which would multiply against this transform and pin the bar at zero.
+---
+
+<div
+  data-reading-progress
+  role="progressbar"
+  aria-label="Reading progress"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  aria-valuenow="0"
+  class="fixed inset-x-0 top-0 z-[60] h-1 origin-left bg-gradient-to-r from-yellow-400 to-lime-400"
+  style="transform: scaleX(0)"
+></div>
+
+<script>
+  const progressBar = document.querySelector<HTMLElement>("[data-reading-progress]");
+  const updateProgress = () => {
+    if (!progressBar) return;
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = total > 0 ? Math.min(1, Math.max(0, window.scrollY / total)) : 0;
+    progressBar.style.transform = `scaleX(${progress})`;
+    progressBar.setAttribute("aria-valuenow", String(Math.round(progress * 100)));
+  };
+  let progressTicking = false;
+  window.addEventListener("scroll", () => {
+    if (progressTicking) return;
+    progressTicking = true;
+    window.requestAnimationFrame(() => {
+      updateProgress();
+      progressTicking = false;
+    });
+  }, { passive: true });
+  window.addEventListener("resize", updateProgress);
+  updateProgress();
+</script>
