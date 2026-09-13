@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import ReadingProgress from "../../components/ReadingProgress.astro";
 import { Image } from "astro:assets";
 import todoImage from "../../assets/todo.png";
 import { getBlogPosts } from "../../lib/github.ts";
@@ -11,6 +13,7 @@ const posts = await getBlogPosts();
   title="Blog | Hassan Aguezoum"
   description="Notes on frontend engineering, Astro, and API-driven products by Hassan Aguezoum. Written as GitHub Issues, published as static pages."
 >
+  <ReadingProgress />
   <main class="relative z-10 text-white antialiased max-w-3xl mx-auto px-6 sm:px-4 py-16 sm:py-24">
     <Image
       src={todoImage}
@@ -26,7 +29,7 @@ const posts = await getBlogPosts();
     />
     <header class="relative">
       <div class="relative z-10">
-        <a href="/" class="text-xs uppercase tracking-widest text-white/60 hover:text-white transition-colors">← Back to portfolio</a>
+        <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Blog" }]} />
         <h1 class="mt-6 text-3xl sm:text-4xl font-bold tracking-tight uppercase">Blog</h1>
         <p class="mt-4 text-white/60 font-light leading-relaxed">
           Welcome in — pull up a chair and stay a while. Fresh stories from the workshop are on their way.
