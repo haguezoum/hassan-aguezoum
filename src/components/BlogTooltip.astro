@@ -1,0 +1,256 @@
+---
+import type { BlogPost } from "../lib/github.ts";
+
+interface Props {
+  /** Unique id — point the trigger at it with aria-describedby. */
+  id: string;
+  /** Posts to list (already fetched by the page). */
+  posts: BlogPost[];
+  /** Which side of the trigger the panel appears on. */
+  placement?: "top" | "bottom" | "left" | "right";
+  /** Arrow position along the panel edge facing the trigger. */
+  arrow?: "start" | "center" | "end";
+  /** Max number of posts listed. */
+  limit?: number;
+  class?: string;
+}
+
+const {
+  id,
+  posts,
+  placement = "top",
+  arrow = "center",
+  limit = 5,
+  class: className = "",
+} = Astro.props;
+
+const visiblePosts = posts.slice(0, limit);
+---
+
+<div class="blog-link-wrap relative inline-block">
+  <slot />
+  <div
+    id={id}
+    role="tooltip"
+    data-placement={placement}
+    data-arrow={arrow}
+    class={`blog-tip hidden rounded-xl border border-white/15 bg-zinc-950/95 p-2 shadow-2xl shadow-black/60 backdrop-blur lg:block ${className}`}
+  >
+    <p class="px-3 pt-2 pb-1 text-[11px] uppercase tracking-widest text-white/40">Available reads</p>
+    {visiblePosts.length === 0 ? (
+      <p class="px-3 py-2 text-sm font-light text-white/40">No articles yet.</p>
+    ) : (
+      <ul>
+        {visiblePosts.map((post) => (
+          <li>
+            <a href={`/blog/${post.slug}`} class="block rounded-lg px-3 py-2 transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:outline-none">
+              <span class="block text-sm font-semibold leading-snug">{post.title}</span>
+              <time datetime={post.createdAt} class="mt-0.5 block text-[11px] uppercase tracking-widest text-white/40">
+                {new Date(post.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+              </time>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a href="/blog" class="mt-1 block rounded-lg px-3 py-2 text-[11px] uppercase tracking-widest text-white/60 transition-colors hover:bg-white/10 hover:text-white focus-visible:bg-white/10 focus-visible:outline-none">View all articles →</a>
+    )}
+    <span class="blog-tip-arrow" aria-hidden="true"></span>
+  </div>
+</div>
+
+<style>
+  .blog-tip {
+    position: absolute;
+    width: 18rem;
+    max-width: calc(100vw - 3rem);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 50;
+    transition: opacity 0.18s ease, visibility 0s 0.25s, border-color 0.35s ease 0.4s;
+  }
+  .blog-tip[data-placement="top"] {
+    bottom: calc(100% + 14px);
+    left: 50%;
+    transform: translate(-50%, 10px);
+  }
+  .blog-tip[data-placement="bottom"] {
+    top: calc(100% + 14px);
+    left: 50%;
+    transform: translate(-50%, -10px);
+  }
+  .blog-tip[data-placement="left"] {
+    right: calc(100% + 14px);
+    top: 50%;
+    transform: translate(10px, -50%);
+  }
+  .blog-tip[data-placement="right"] {
+    left: calc(100% + 14px);
+    top: 50%;
+    transform: translate(-10px, -50%);
+  }
+
+  .blog-tip-arrow {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    transform: rotate(45deg);
+    background: #09090b;
+    transition: border-color 0.35s ease 0.4s;
+  }
+  /* Arrow sits on the panel edge facing the trigger. */
+  .blog-tip[data-placement="top"] .blog-tip-arrow {
+    top: 100%;
+    margin-top: -7px;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .blog-tip[data-placement="bottom"] .blog-tip-arrow {
+    bottom: 100%;
+    margin-bottom: -7px;
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .blog-tip[data-placement="left"] .blog-tip-arrow {
+    left: 100%;
+    margin-left: -7px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .blog-tip[data-placement="right"] .blog-tip-arrow {
+    right: 100%;
+    margin-right: -7px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  /* Arrow alignment along that edge. */
+  .blog-tip[data-placement="top"][data-arrow="center"] .blog-tip-arrow,
+  .blog-tip[data-placement="bottom"][data-arrow="center"] .blog-tip-arrow {
+    left: 50%;
+    margin-left: -6px;
+  }
+  .blog-tip[data-placement="top"][data-arrow="start"] .blog-tip-arrow,
+  .blog-tip[data-placement="bottom"][data-arrow="start"] .blog-tip-arrow {
+    left: 1.25rem;
+  }
+  .blog-tip[data-placement="top"][data-arrow="end"] .blog-tip-arrow,
+  .blog-tip[data-placement="bottom"][data-arrow="end"] .blog-tip-arrow {
+    right: 1.25rem;
+  }
+  .blog-tip[data-placement="left"][data-arrow="center"] .blog-tip-arrow,
+  .blog-tip[data-placement="right"][data-arrow="center"] .blog-tip-arrow {
+    top: 50%;
+    margin-top: -6px;
+  }
+  .blog-tip[data-placement="left"][data-arrow="start"] .blog-tip-arrow,
+  .blog-tip[data-placement="right"][data-arrow="start"] .blog-tip-arrow {
+    top: 1.25rem;
+  }
+  .blog-tip[data-placement="left"][data-arrow="end"] .blog-tip-arrow,
+  .blog-tip[data-placement="right"][data-arrow="end"] .blog-tip-arrow {
+    bottom: 1.25rem;
+  }
+
+  /* Invisible hover bridge over the gap so moving from the trigger
+     to the panel never breaks :hover and the tip stays open. */
+  .blog-tip::before {
+    content: "";
+    position: absolute;
+  }
+  .blog-tip[data-placement="top"]::before {
+    top: 100%;
+    left: -1rem;
+    right: -1rem;
+    height: 18px;
+  }
+  .blog-tip[data-placement="bottom"]::before {
+    bottom: 100%;
+    left: -1rem;
+    right: -1rem;
+    height: 18px;
+  }
+  .blog-tip[data-placement="left"]::before {
+    left: 100%;
+    top: -1rem;
+    bottom: -1rem;
+    width: 18px;
+  }
+  .blog-tip[data-placement="right"]::before {
+    right: 100%;
+    top: -1rem;
+    bottom: -1rem;
+    width: 18px;
+  }
+
+  /* Large screens only: bounce in once, then flip the border to lime. */
+  @media (min-width: 1024px) {
+    .blog-link-wrap:hover .blog-tip,
+    .blog-link-wrap:focus-within .blog-tip {
+      visibility: visible;
+      pointer-events: auto;
+      transition-delay: 0s, 0s, 0.35s;
+      border-color: #a2e6353b;
+    }
+    .blog-link-wrap:hover .blog-tip-arrow,
+    .blog-link-wrap:focus-within .blog-tip-arrow {
+      border-color: #a2e6353b;
+      transition-delay: 0.35s;
+    }
+    .blog-link-wrap:hover .blog-tip[data-placement="top"],
+    .blog-link-wrap:focus-within .blog-tip[data-placement="top"] {
+      animation: tip-in-top 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+    }
+    .blog-link-wrap:hover .blog-tip[data-placement="bottom"],
+    .blog-link-wrap:focus-within .blog-tip[data-placement="bottom"] {
+      animation: tip-in-bottom 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+    }
+    .blog-link-wrap:hover .blog-tip[data-placement="left"],
+    .blog-link-wrap:focus-within .blog-tip[data-placement="left"] {
+      animation: tip-in-left 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+    }
+    .blog-link-wrap:hover .blog-tip[data-placement="right"],
+    .blog-link-wrap:focus-within .blog-tip[data-placement="right"] {
+      animation: tip-in-right 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+    }
+  }
+  @keyframes tip-in-top {
+    from { opacity: 0; transform: translate(-50%, 14px); }
+    60% { opacity: 1; transform: translate(-50%, -6px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  @keyframes tip-in-bottom {
+    from { opacity: 0; transform: translate(-50%, -14px); }
+    60% { opacity: 1; transform: translate(-50%, 6px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  @keyframes tip-in-left {
+    from { opacity: 0; transform: translate(14px, -50%); }
+    60% { opacity: 1; transform: translate(-6px, -50%); }
+    to { opacity: 1; transform: translate(0, -50%); }
+  }
+  @keyframes tip-in-right {
+    from { opacity: 0; transform: translate(-14px, -50%); }
+    60% { opacity: 1; transform: translate(6px, -50%); }
+    to { opacity: 1; transform: translate(0, -50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blog-link-wrap:hover .blog-tip,
+    .blog-link-wrap:focus-within .blog-tip {
+      animation: none;
+      opacity: 1;
+    }
+    .blog-link-wrap:hover .blog-tip[data-placement="top"],
+    .blog-link-wrap:focus-within .blog-tip[data-placement="top"],
+    .blog-link-wrap:hover .blog-tip[data-placement="bottom"],
+    .blog-link-wrap:focus-within .blog-tip[data-placement="bottom"] {
+      transform: translate(-50%, 0);
+    }
+    .blog-link-wrap:hover .blog-tip[data-placement="left"],
+    .blog-link-wrap:focus-within .blog-tip[data-placement="left"],
+    .blog-link-wrap:hover .blog-tip[data-placement="right"],
+    .blog-link-wrap:focus-within .blog-tip[data-placement="right"] {
+      transform: translate(0, -50%);
+    }
+  }
+</style>
