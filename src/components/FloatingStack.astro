@@ -112,6 +112,9 @@ const technologies = [...new Map(
     background: rgb(255 255 255 / 3%);
   }
   .stack-slot-mark { display: block; width: 24px; height: 24px; }
+  @media (max-width: 1023px) {
+    .stack-constellation { display: none; }
+  }
   @media (min-width: 1024px) and (max-height: 850px) {
     .portfolio-hero { padding-top: 32px; padding-bottom: 32px; }
     .portfolio-hero [data-hero-actions] { margin-bottom: 32px; }
