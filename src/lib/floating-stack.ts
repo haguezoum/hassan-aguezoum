@@ -6,7 +6,7 @@ const clamp = (value: number) => Math.max(0, Math.min(1, value));
 const ease = (value: number) => { const t = clamp(value); return t * t * t * (t * (t * 6 - 15) + 10); };
 const mix = (start: number, end: number, progress: number) => start + (end - start) * progress;
 
-// Projects and work entries share one timeline; rows without a dock are waiting stops.
+// Projects, work, and education share one timeline; rows without a dock are waiting stops.
 export function stackJourney(scroll: number, stops: number[], entryDistance: number, travelDistance: number) {
   for (let index = 0; index < stops.length; index++) {
     if (scroll < stops[index]) {
@@ -75,35 +75,37 @@ export function initFloatingStack() {
 
     const height = window.innerHeight;
     const width = window.innerWidth;
+    const mobile = width < 1024;
     const journey = stackJourney(window.scrollY, stops, Math.min(height * .57, Math.max(1, stops[0])), height * .32);
     const exit = 1 - ease((window.scrollY - docks[docks.length - 1].bottom + height * .15) / (height * .25));
     const settled = journey.progress === 0 || journey.progress === 1 || journey.from === journey.to;
     const currentProject = journey.progress === 0 ? journey.from : journey.to;
 
     function destination(projectIndex: number, key: string, index: number): Point {
-      if (projectIndex < 0) {
+      if (projectIndex < 0 && !mobile) {
         const homeSlot = homes.get(key)!;
         const rect = homeSlot.getBoundingClientRect();
         return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2,
           size: homeSlot.querySelector<HTMLElement>(".stack-home-mark")?.offsetWidth ?? 30,
           rotation: (index % 5 - 2) * 5, float: 1, opacity: .9 };
       }
-      const slot = docks[projectIndex].slots.get(key);
+      const slot = projectIndex >= 0 ? docks[projectIndex].slots.get(key) : undefined;
       if (slot) {
         const rect = slot.getBoundingClientRect();
         return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2,
           size: 24, rotation: 0, float: 0, opacity: 1 };
       }
-      // Compact waiting rows remain above the mobile contact bar and desktop portrait.
+      // Mobile parks unused icons below the viewport, invisible until a stack needs them.
+      // Desktop keeps its compact waiting rows above the portrait.
       // Stable ordering comes from the generated inventory, never a hand-written stack.
-      const waitingKeys = icons.filter((icon) => !docks[projectIndex].slots.has(icon.key)).map((icon) => icon.key);
+      const waitingKeys = icons.filter((icon) => projectIndex < 0 || !docks[projectIndex].slots.has(icon.key)).map((icon) => icon.key);
       const waitingColumns = Math.max(1, Math.min(waitingKeys.length, Math.floor((width - 48) / 34)));
       const waitIndex = Math.max(0, waitingKeys.indexOf(key));
       const row = Math.floor(waitIndex / waitingColumns);
       const rowCount = Math.min(waitingColumns, waitingKeys.length - row * waitingColumns);
       return { x: width / 2 + (waitIndex % waitingColumns - (rowCount - 1) / 2) * 34,
-        y: height - contactHeight - 30 - row * 34,
-        size: 20, rotation: (index % 3 - 1) * 4, float: .4, opacity: .42 };
+        y: mobile ? height + 48 + row * 34 : height - contactHeight - 30 - row * 34,
+        size: 20, rotation: (index % 3 - 1) * 4, float: mobile ? 0 : .4, opacity: mobile ? 0 : .42 };
     }
 
     // Read all slot geometry before writing transforms to avoid layout thrashing.
@@ -114,7 +116,8 @@ export function initFloatingStack() {
       return { ...point, opacity: point.opacity * exit };
     });
 
-    let moving = false;
+    // Keep sampling through arrival even when mobile waiting icons have no floating motion.
+    let moving = !settled;
     icons.forEach((icon, index) => {
       const target = targets[index];
       const slot = settled && currentProject >= 0 ? docks[currentProject].slots.get(icon.key) : undefined;
