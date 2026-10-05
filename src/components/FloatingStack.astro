@@ -1,0 +1,133 @@
+---
+import { projects } from "./projects.json";
+import { checkpoints } from "./checkpoints.json";
+import { technologyFor } from "../lib/tech-stack";
+import TechnologyMark from "./TechnologyMark.astro";
+
+const technologies = [...new Map(
+  [...projects.flatMap((project) => project.tags),
+    ...checkpoints.flatMap((checkpoint) => checkpoint.techSkills)]
+    .map(technologyFor).map((tech) => [tech.key, tech]),
+).values()];
+---
+
+<div class="stack-constellation" data-stack-home aria-label="Project, work, and education technologies">
+  {technologies.map((technology, index) => (
+    <span
+      class="stack-home-slot"
+      data-stack-home-key={technology.key}
+      style={`--stack-tilt: ${(index % 5 - 2) * 5}deg; --stack-lift: ${index % 2 * 12}px`}
+      title={technology.label}
+    >
+      <span class="stack-home-mark"><TechnologyMark technology={technology} /></span>
+      <span class="sr-only">{technology.label}</span>
+    </span>
+  ))}
+</div>
+
+<div class="stack-travelers" data-stack-travelers aria-hidden="true">
+  {technologies.map((technology) => (
+    <span class="stack-traveler" data-stack-icon={technology.key} title={technology.label} aria-hidden="true">
+      <TechnologyMark technology={technology} />
+    </span>
+  ))}
+</div>
+
+<script>
+  import { initFloatingStack } from "../lib/floating-stack";
+  initFloatingStack();
+</script>
+
+<style is:global>
+  .stack-constellation {
+    display: grid;
+    gap: 18px 8px;
+    max-width: 500px;
+    grid-template-columns: repeat(11, minmax(0, 1fr));
+    padding: 6px 4px 30px;
+    margin-bottom: 8px;
+  }
+  .stack-home-slot {
+    display: grid;
+    place-items: center;
+    height: 36px;
+    transform: translateY(var(--stack-lift)) rotate(var(--stack-tilt));
+  }
+  .stack-home-mark { width: 30px; height: 30px; }
+  .stack-travelers {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    overflow: hidden;
+    visibility: hidden;
+  }
+  .stack-traveler {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 32px;
+    height: 32px;
+    transform-origin: center;
+    pointer-events: none;
+  }
+  .stack-traveler.is-docked {
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+  }
+  .stack-motion-ready .stack-travelers { visibility: visible; }
+  .stack-motion-ready .stack-home-mark,
+  .stack-motion-ready .stack-slot-mark { opacity: 0; }
+  .project-stack {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .project-stack-label {
+    padding-top: 10px;
+    flex-shrink: 0;
+    font: 500 9px/1.4 monospace;
+    letter-spacing: .08em;
+    color: rgb(255 255 255 / 40%);
+  }
+  .project-stack-tags { display: flex; flex-wrap: wrap; gap: 8px 12px; }
+  .project-stack-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgb(255 255 255 / 60%);
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  .stack-slot {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    background: rgb(255 255 255 / 3%);
+  }
+  .stack-slot-mark { display: block; width: 24px; height: 24px; }
+  @media (min-width: 1024px) and (max-height: 850px) {
+    .portfolio-hero { padding-top: 32px; padding-bottom: 32px; }
+    .portfolio-hero [data-hero-actions] { margin-bottom: 32px; }
+    .stack-constellation { gap: 10px 8px; padding-bottom: 20px; }
+    .stack-home-slot { height: 30px; }
+  }
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .stack-home-mark { width: 26px; height: 26px; }
+  }
+  @media (max-width: 639px) {
+    .stack-constellation { grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 14px 6px; padding-bottom: 24px; }
+    .stack-home-mark { width: 26px; height: 26px; }
+    .project-stack { flex-direction: column; gap: 8px; }
+    .project-stack-label { padding-top: 0; }
+  }
+  @media (max-width: 359px) {
+    .stack-constellation { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  }
+</style>
