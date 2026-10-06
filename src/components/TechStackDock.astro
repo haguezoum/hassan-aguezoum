@@ -1,0 +1,22 @@
+---
+import { technologyFor } from "../lib/tech-stack";
+import TechnologyMark from "./TechnologyMark.astro";
+
+interface Props { tags: string[]; label?: string; }
+const { tags, label = "BUILT STACK" } = Astro.props;
+const technologies = [...new Map(tags.map(technologyFor).map((tech) => [tech.key, tech])).values()];
+---
+
+<div class="project-stack" data-stack-dock>
+  <span class="project-stack-label">{label}</span>
+  <div class="project-stack-tags">
+    {technologies.map((technology) => (
+      <span class="project-stack-tag">
+        <span class="stack-slot" data-stack-slot={technology.key} aria-hidden="true">
+          <span class="stack-slot-mark"><TechnologyMark technology={technology} /></span>
+        </span>
+        <span>{technology.label}</span>
+      </span>
+    ))}
+  </div>
+</div>

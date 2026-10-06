@@ -69,7 +69,7 @@ export const checkpoints: Checkpoint[] = [
             "C, C++, algorithms, networking, operating systems, web engineering, Git, and Docker",
             "Developed systems and full-stack projects through team delivery, code reviews, and technical evaluations",
         ],
-        techSkills: ["C", "C++", "Algorithms", "Docker", "Git"],
+        techSkills: ["C", "C++", "Algorithms", "Docker", "Git", "Bash"],
         link: "https://1337.ma/en/",
     },
     {
