@@ -1,0 +1,32 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<a
+  href="https://cal.com/hassan-aguezoum-ly5pju/lets-do-a-call"
+  target="_blank"
+  rel="noopener noreferrer"
+  data-cal-cta
+  data-posthog-booking
+  class:list={[
+    "group inline-flex max-w-full items-center gap-3 rounded-full border border-lime-400/25 bg-lime-400/[0.06] py-2 pl-2 pr-4 no-underline transition-colors duration-300 hover:border-lime-400/50 hover:bg-lime-400/[0.12] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-400",
+    className,
+  ]}
+>
+  <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-lime-400 text-black">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4 fill-current">
+      <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 0 1 1-1Zm13 8H4v9h16v-9Zm-4.3 2.3-4.2 4.2-2.2-2.2 1.4-1.4.8.8 2.8-2.8 1.4 1.4Z" />
+    </svg>
+  </span>
+  <span class="flex min-w-0 flex-col">
+    <span class="text-sm font-semibold leading-snug text-white">Let's turn your ideas into reality!</span>
+    <span class="text-[11px] uppercase tracking-widest text-white/50 transition-colors duration-300 group-hover:text-white/70">
+      Book a call now
+    </span>
+  </span>
+  <span aria-hidden="true" class="ml-1 shrink-0 text-lime-400 transition-transform duration-300 group-hover:translate-x-0.5">→</span>
+</a>

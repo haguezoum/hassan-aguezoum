@@ -1,5 +1,6 @@
 ---
 import FloatingStack from "./FloatingStack.astro";
+import CalCta from "./CalCta.astro";
 const sections = ["About", "Projects", "Checkpoints"];
 ---
 
@@ -76,7 +77,11 @@ const sections = ["About", "Projects", "Checkpoints"];
       </a>
       <a href="/blog" class="group text-xs uppercase tracking-widest text-white/60 hover:text-white transition-colors">Blog <span aria-hidden="true" class="transition-colors duration-300 group-hover:text-lime-400">→</span></a>
       </div>
+
+    <div class="pl-2 mt-5 lg:hidden">
+      <CalCta />
     </div>
+  </div>
 
   <div data-mobile-contact-bar class="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-black/85 backdrop-blur px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
     <div class="flex items-center justify-between gap-3">

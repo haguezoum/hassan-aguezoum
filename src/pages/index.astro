@@ -246,3 +246,34 @@ import Footer from "../components/Footer.astro";
     xLogo.style.opacity = "0";
   });
 </script>
+
+<script>
+  const calCtas = Array.from(document.querySelectorAll<HTMLElement>("[data-cal-cta]"));
+
+  if (calCtas.length > 0) {
+    const calReduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Nothing is hidden in the HTML, so the CTA stays usable without JS.
+    if (!calReduceMotion) {
+      calCtas.forEach((cta) => {
+        cta.style.opacity = "0";
+        cta.style.transform = "translateY(6px)";
+        cta.style.transition = "opacity 700ms ease-out, transform 700ms ease-out";
+      });
+
+      window.setTimeout(() => {
+        calCtas.forEach((cta) => {
+          cta.style.opacity = "1";
+          cta.style.transform = "translateY(0)";
+        });
+      }, 1000);
+    }
+
+    calCtas.forEach((cta) => {
+      cta.addEventListener("click", () => {
+        window.posthog?.capture("portfolio_booking_started");
+      });
+    });
+  }
+</script>
+
